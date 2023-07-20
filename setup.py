@@ -8,8 +8,8 @@ import broot
 setup(
     name="BROOT",
     description="Viewer for CERN format ROOT",
-    version=sradio.__version__,
-    author=sradio.__author__,
+    version=broot.__version__,
+    author=broot.__author__,
     classifiers=[
         "Topic :: Scientific/Engineering :: Astronomy",
         "Topic :: Scientific/Engineering :: Physics",
