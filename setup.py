@@ -16,7 +16,7 @@ setup(
     ],
     url="https://github.com/luckyjim/BROOT",
     package_dir={"broot": "src/broot"},
-    scripts=["script/broot"],
+    scripts=["script/BROOT.py"],
     license='MIT',
     python_requires='>=3.8',
     install_requires=["appJar", "matplotlib", "uproot", "numpy"]
