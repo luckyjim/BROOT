@@ -93,7 +93,7 @@ def main_gui():
             plot_gui(app, data, f"{ttree}/{branch}")
             
     app = gui()
-    select_file = app.openBox("BROOT open ROOT file", dirName="/home/jcolley/temp/grand/detector", fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
+    select_file = app.openBox("BROOT open ROOT file", fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
     print(select_file)
     print(type(select_file))
     frt = select_file
