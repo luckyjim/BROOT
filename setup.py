@@ -14,7 +14,7 @@ setup(
         "Topic :: Scientific/Engineering :: Astronomy",
         "Topic :: Scientific/Engineering :: Physics",
     ],
-    url="https://github.com/grand-mother/NUTRIG1",
+    url="https://github.com/luckyjim/BROOT",
     package_dir={"broot": "src/broot"},
     scripts=["src/broot_main.py"],
     license='MIT',
