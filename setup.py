@@ -1,7 +1,7 @@
 from setuptools import setup
 import sys
 
-# sys.path.append('shower_radio/src')
+sys.path.append('src')
 
 import broot
 
