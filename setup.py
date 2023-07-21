@@ -7,7 +7,7 @@ import broot
 
 setup(
     name="BROOT",
-    description="Viewer for CERN format ROOT",
+    description="Browser for ROOT files from CERN collaboration.",
     version=broot.__version__,
     author=broot.__author__,
     classifiers=[
@@ -19,5 +19,5 @@ setup(
     scripts=["script/BROOT.py"],
     license='MIT',
     python_requires='>=3.8',
-    install_requires=["appJar", "matplotlib", "uproot", "numpy"]
+    install_requires=["appJar", "matplotlib", "uproot", "numpy","scipy"]
 )

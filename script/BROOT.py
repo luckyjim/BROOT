@@ -70,7 +70,7 @@ def plot1d_gui(app, data, title=""):
         if not f_conv: return
         plt.figure()
         plt.title(title + f",histogram for range [{s_idx}]")
-        plt.hist(data_1d.ravel(),log=True)
+        plt.hist(data_1d.ravel(), log=True)
         plt.grid()
         plt.show()
              
@@ -111,7 +111,6 @@ def plot1d_gui(app, data, title=""):
             app.addRadioButton(f"OPTION_{idx}", "Slide", row=idx + 1, column=3)
             app.addRadioButton(f"OPTION_{idx}", "New", row=idx + 1, column=4)
         app.stopFrame()
-    
     e_freq = "Freq. sampling Hz"
     app.addLabelEntry(e_freq, column=1)
     app.setEntry(e_freq, 1.0)  
