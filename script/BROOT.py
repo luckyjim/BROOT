@@ -162,7 +162,8 @@ def main_gui():
             
     app = gui()
     app.setSize(1000, 600)
-    my_path = "/home/jcolley2/temp/projet/grand_wk/data/root"
+    # my_path = "/home/jcolley/temp/projet/grand_wk/data/root"
+    # my_path = "/home/jcolley/temp"
     frt = app.openBox("BROOT open ROOT file", dirName=my_path, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
     if len(frt) == 0:
         sys.exit(0)
@@ -188,26 +189,28 @@ def main_gui():
             print(t_idx, idx0, branch)
             print("Please wait, reading TBranch ...")  
             l_act.append(f"Plot_{ttree}")
-            val_br = drt[ttree][branch].array()
-            if isinstance(val_br[0], str):
-                tbl_br.append([idx1, f"{branch}", f"'{val_br[0]}'", "String", "NA", f"{len(val_br[0])}"])
-            else:
-                try:
-                    # NUMPY array
-                    np_br = val_br.to_numpy()                
-                    new_line = [idx1, f"{branch}", f"Array! Try Action", f"{np_br.dtype}", f"{np_br.shape}", f"{np_br.nbytes:,}"]
-                    if np_br.size == 0:
-                        new_line[2] = f"Empty !?"
-                    elif np_br.size == 1:
-                        new_line[2] = np_br.ravel()[0] 
-                except:
-                    # IRREGULAR array
-                    a_type_s = val_br.typestr.split('*')
-                    a_shape = '(' + ','.join(a_type_s[:-1]) + ')' 
-                    a_shape = a_shape.replace(' ', '')
-                    new_line = [idx1, f"{branch}", f"Array! Try Action", f"{a_type_s[-1].strip()}", f"{a_shape}", f"{val_br.nbytes:,}"]
-                tbl_br.append(new_line)
-                # if idx > 5: break
+            val_br = drt[ttree][branch].array()            
+            try:
+                # NUMPY array
+                np_br = val_br.to_numpy()                
+                new_line = [idx1, f"{branch}", f"Array! Try Action", f"{np_br.dtype}", f"{np_br.shape}", f"{np_br.nbytes:,}"]
+                if np_br.size == 0:
+                    new_line[2] = f"Empty !?"
+                if np_br.size == 1:
+                    print(np_br)
+                    if val_br.typestr.find('string') >= 0:
+                        new_line[2] = f"'{np_br[0]}'"
+                        new_line[3] = 'string'
+                    else:
+                        new_line[2] = np_br.ravel()[0]
+            except:
+                # IRREGULAR array
+                a_type_s = val_br.typestr.split('*')
+                a_shape = '(' + ','.join(a_type_s[:-1]) + ')' 
+                a_shape = a_shape.replace(' ', '')
+                new_line = [idx1, f"{branch}", f"Array! Try Action", f"{a_type_s[-1].strip()}", f"{a_shape}", f"{val_br.nbytes:,}"]
+            tbl_br.append(new_line)
+            # if idx > 5: break
             t_idx += 1            
         l_button = [f"Print_{idx_t}", f"Plot1D_{idx_t}", f"Plot2D_{idx_t}", f"Image_{idx_t}"]
         app.addTable(f"table{idx_t}", tbl_br, showMenu=True, action=main_action, actionButton=l_button)
