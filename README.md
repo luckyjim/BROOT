@@ -21,7 +21,7 @@ $ BROOT.py
 # BROOT GUI
 
 ## Table for each TTree
-![BROOT_table](docs/BROOT.png)
+![BROOT_table](docs/BROOT2.png)
 
 ### Basic print value
 
