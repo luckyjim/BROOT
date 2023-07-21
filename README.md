@@ -1,4 +1,4 @@
-# BROOT
+# BROOT presentation
 
 BROOT is a browser for [ROOT files](https://root.cern/manual/io), format defined and used by CERN collaboration.
 
@@ -11,3 +11,31 @@ BROOT installs very simply with pip install
 ```
 pip install git+https://github.com/luckyjim/BROOT.git 
 ```
+
+# BROOT GUI
+
+## Table for each TTree
+![BROOT_table](docs/BROOT.png)
+
+### Basic print value
+
+![BROOT_print](docs/BROOT_print.png)
+
+## Basic plots
+
+Range of plot is configurable with same syntax as numpy array.
+
+### Plot 1D
+
+![BROOT_1d](docs/BROOT_plot_1d.png)
+
+### Spectrum 1D
+
+![BROOT_1d](docs/BROOT_psd.png)
+
+### Histogram
+
+![BROOT_1d](docs/BROOT_histo.png)
+
+
+

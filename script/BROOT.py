@@ -159,7 +159,7 @@ def main_gui():
             app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
             
     app = gui()
-    app.setSize(1000, 600)
+    app.setSize(600, 600)
     my_path = "/home/jcolley/temp/projet/grand_wk/data/root"
     frt = app.openBox("BROOT open ROOT file", dirName=my_path, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
     drt = ur.open(frt)
