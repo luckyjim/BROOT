@@ -4,12 +4,17 @@ Created on 19 juil. 2023
 
 @author: jcolley
 '''
+import argparse
+import sys
+
+
 from appJar import gui
 import uproot as ur
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as ssig 
 
+import broot
 
 def plot1d_gui(app, data, title=""):
     
@@ -23,7 +28,7 @@ def plot1d_gui(app, data, title=""):
         try:
             plot_d = data[slice_]
         except:
-            app.infoBox("ERROR", f"Slice {s_idx} not valid ?")
+            app.errorBox("ERROR", f"Slice {s_idx} not valid ?")
             return False, None, s_idx
         if not isinstance(plot_d, np.ndarray):
             plot_d = plot_d.to_numpy()
@@ -43,12 +48,11 @@ def plot1d_gui(app, data, title=""):
         
     def press_spectrum(pars):
         f_conv , data_1d , s_idx = get_slice_array()
-        print(data_1d)
         if not f_conv: return
         try:
             freq = float(app.getEntry(e_freq))
         except:
-            app.infoBox("ERROR", f"{e_freq} must be a number.\nFix to 1 Hz")
+            app.errorBox("ERROR", f"{e_freq} must be a number.\nFix to 1 Hz")
             freq = 1
         plt.figure()
         plt.title(title + f",PSD for range [{s_idx}]")
@@ -66,7 +70,6 @@ def plot1d_gui(app, data, title=""):
 
     def press_histo(pars):
         f_conv , data_1d , s_idx = get_slice_array()
-        print(data_1d)
         if not f_conv: return
         plt.figure()
         plt.title(title + f",histogram for range [{s_idx}]")
@@ -126,7 +129,7 @@ def plot1d_gui(app, data, title=""):
 def main_gui():
     
     def main_action(s_but, i_line):
-        print(f"Call event_plot() with pars {s_but} {i_line}")
+        #print(f"Call event_plot() with pars {s_but} {i_line}")
         # for arg in argv:
         #     print("Next argument through *argv :", arg)
         # for key, value in kwargs.items():
@@ -134,14 +137,13 @@ def main_gui():
         id_t = int(s_but.split('_')[-1])
         ttree = l_ttree[id_t].split(';')[0]
         branch = all_branch[id_t][i_line]
-        print(f"{ttree} {branch}")
-        print(type(ttree), type(branch))
+        # print(f"{ttree} {branch}")
+        # print(type(ttree), type(branch))
         data = drt[l_ttree[id_t]][branch].array()
         try:
             data = data.to_numpy()
         except:
             pass
-        print(s_but, s_but.find("Print"), data)
         if s_but.find("Print") >= 0:
             try:
                 str_a = np.array2string(data)
@@ -159,16 +161,19 @@ def main_gui():
             app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
             
     app = gui()
-    app.setSize(600, 600)
+    app.setSize(1000, 600)
     my_path = "/home/jcolley/temp/projet/grand_wk/data/root"
     frt = app.openBox("BROOT open ROOT file", dirName=my_path, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
+    if len(frt) == 0:
+        sys.exit(0)
     drt = ur.open(frt)
     t_idx = 0
     l_ttree = list(drt.keys()).copy()
     l_ttree.sort()
     all_branch = []
     app.startTabbedFrame("TabbedFrame")
-    app.setFont(18)    
+    app.setTitle(f"BROOT {frt}")
+    app.setFont(18) 
     for idx_t, ttree in enumerate(l_ttree):
         fttree = ttree.split(';')[0]
         app.startTab(fttree)
@@ -181,6 +186,7 @@ def main_gui():
         for idx0, branch in enumerate(l_branch):
             idx1 = idx0 + 1
             print(t_idx, idx0, branch)
+            print("Please wait, reading TBranch ...")  
             l_act.append(f"Plot_{ttree}")
             val_br = drt[ttree][branch].array()
             if isinstance(val_br[0], str):
@@ -211,4 +217,16 @@ def main_gui():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Browser for ROOT files from CERN collaboration.")
+    parser.add_argument(
+        "-v",
+        "--version",
+        help="BROOT version",
+        action="store_true",
+        required=False
+    )
+    args = parser.parse_args()
+    if args.version:
+        print(broot.__version__)
+        sys.exit(0)
     main_gui()
