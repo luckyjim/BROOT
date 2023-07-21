@@ -164,7 +164,8 @@ def main_gui():
     app.setSize(1000, 600)
     # my_path = "/home/jcolley/temp/projet/grand_wk/data/root"
     # my_path = "/home/jcolley/temp"
-    frt = app.openBox("BROOT open ROOT file", dirName=my_path, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
+    #frt = app.openBox("BROOT open ROOT file", dirName=my_path, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
+    frt = app.openBox("BROOT open ROOT file", fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
     if len(frt) == 0:
         sys.exit(0)
     drt = ur.open(frt)
