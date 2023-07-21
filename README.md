@@ -5,3 +5,9 @@ BROOT is a browser for [ROOT files](https://root.cern/manual/io), format defined
 BROOT is an alternative to the [TBrowser tool](https://root.cern/manual/root_files/#root-object-browser)
 
 BROOT doesn't use the ROOT library but the IO-specific [uproot](https://uproot.readthedocs.io/en/latest/) library.
+
+BROOT installs very simply with pip install
+
+```
+pip install git+https://github.com/luckyjim/BROOT.git 
+```
