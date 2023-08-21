@@ -18,6 +18,6 @@ setup(
     package_dir={"broot": "src/broot"},
     scripts=["script/BROOT.py"],
     license='MIT',
-    python_requires='>=3.8',
+    python_requires='>=3.7',
     install_requires=["appJar", "matplotlib", "uproot", "numpy","scipy"]
 )

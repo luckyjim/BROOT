@@ -6,16 +6,24 @@ BROOT is an alternative to the [TBrowser tool](https://root.cern/manual/root_fil
 
 BROOT doesn't use the ROOT library but the IO-specific library [uproot](https://uproot.readthedocs.io/en/latest/).
 
-BROOT installs very simply with pip install
+# Installation
+
+Check if tkinter library is correctly installed with
 
 ```
-$ pip install git+https://github.com/luckyjim/BROOT.git 
+python -m tkinter
+```
+
+then BROOT installs very simply with pip install
+
+```
+pip install git+https://github.com/luckyjim/BROOT.git 
 ```
 
 run BROOT in a terminal with this command
 
 ```
-$ BROOT.py
+BROOT.py
 ```
 
 # BROOT GUI
