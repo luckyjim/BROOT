@@ -43,7 +43,7 @@ Range of plot is configurable with GUI, same syntax as [numpy](https://numpy.org
 
 ![BROOT_1d](docs/BROOT_plot_1d.png)
 
-### Power density spectrum
+### Power spectrum density
 
 You can configure the frequency of sampling with GUI.
 
