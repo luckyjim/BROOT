@@ -15,7 +15,7 @@ setup(
         "Topic :: Scientific/Engineering :: Physics",
     ],
     url="https://github.com/luckyjim/BROOT",
-    package_dir={"broot": "src"},
+    package_dir={"broot": "src/broot"},
     scripts=["script/BROOT.py"],
     license='MIT',
     python_requires='>=3.7',
