@@ -14,16 +14,23 @@ Check if tkinter library is correctly installed with
 python -m tkinter
 ```
 
+
 then BROOT installs very simply with pip install
 
 ```
-pip install git+https://github.com/luckyjim/BROOT.git 
+python -m pip install git+https://github.com/luckyjim/BROOT.git 
 ```
 
 run BROOT in a terminal with this command
 
 ```
 BROOT.py
+```
+
+upgrading pip and setuptools packages can help
+
+```
+pip install --upgrade setuptools pip
 ```
 
 # BROOT GUI
