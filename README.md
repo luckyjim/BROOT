@@ -14,6 +14,7 @@ Check if tkinter library is correctly installed with
 python -m tkinter
 ```
 
+else see [installation documentation](https://tkdocs.com/tutorial/install.html)
 
 then BROOT installs very simply with pip install
 
