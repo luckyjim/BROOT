@@ -8,7 +8,7 @@ import argparse
 import sys
 import os
 import os.path
-import pathlib
+
 
 from appJar import gui
 import uproot as ur
@@ -265,15 +265,9 @@ def main_gui(r_file=None, d_file=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Browser for ROOT files from CERN collaboration.")
     parser.add_argument(
-        "-d",
-        "--dir",
-        help="directory to ROOT files",type=pathlib.Path,
-        required=False
-    )
-    parser.add_argument(
         "-f",
         "--file",
-        help="path to ROOT file", type=argparse.FileType('r'),
+        help="path to ROOT file or directory",
         required=False
     )
     parser.add_argument(
@@ -287,10 +281,11 @@ if __name__ == '__main__':
     if args.version:
         sys.exit(0)
     if args.file is not None:
-        main_gui(r_file=args.file.name)
-    elif args.dir is not None:
-        dir_root = os.path.abspath(args.dir)
-        assert os.path.exists(dir_root), f"{dir_root} doesn't exist !!"
-        main_gui(d_file= dir_root)
+        abs_file = os.path.abspath(args.file)
+        assert os.path.exists(abs_file), f"'{abs_file}' doesn't exist !!"
+        if os.path.isdir(abs_file):
+            main_gui(d_file= abs_file)
+        else:
+            main_gui(r_file=abs_file)
     else:
         main_gui()
