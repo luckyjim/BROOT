@@ -6,7 +6,9 @@ Created on 19 juil. 2023
 '''
 import argparse
 import sys
-
+import os
+import os.path
+import pathlib
 
 from appJar import gui
 import uproot as ur
@@ -15,6 +17,7 @@ import numpy as np
 import scipy.signal as ssig 
 
 import broot
+
 
 def plot1d_gui(app, data, title=""):
     
@@ -80,6 +83,10 @@ def plot1d_gui(app, data, title=""):
     # def press_cancel(pars):
     #     app.destroySubWindow("one")
     
+    try:
+        app.destroySubWindow("one")
+    except:
+        pass
     app.startSubWindow("one", f"Plot {title}", modal=True, blocking=True)
     app.setSize(1000, 300)
     app.setExpand("both")
@@ -123,18 +130,28 @@ def plot1d_gui(app, data, title=""):
     app.addButton("Histogram", press_histo, row=ndim + offset_row, column=2)
     app.stopSubWindow()
     app.showSubWindow("one")
-    app.destroySubWindow("one")
 
 
-def main_gui():
+def main_gui(r_file=None, d_file=None):
     
     def main_action(s_but, i_line):
-        #print(f"Call event_plot() with pars {s_but} {i_line}")
+        '''
+        cette fonction est appelée quand l'utilisateur appuie sur un des boutons action
+        
+        
+        :param s_but: name of the buttom
+        :param i_line: line number associated with  buttom
+        '''
+        
+        # print(f"Call event_plot() with pars {s_but} {i_line}")
         # for arg in argv:
         #     print("Next argument through *argv :", arg)
         # for key, value in kwargs.items():
         #     print(f"{key}: {value}")
-        id_t = int(s_but.split('_')[-1])
+        ttree_name = app.getTabbedFrameSelectedTab("TabbedFrame")
+        # print(ttree_name)
+        # id_t = int(s_but.split('_')[-1])
+        id_t = l_ttree.index(ttree_name)
         ttree = l_ttree[id_t].split(';')[0]
         branch = all_branch[id_t][i_line]
         # print(f"{ttree} {branch}")
@@ -145,46 +162,69 @@ def main_gui():
         except:
             pass
         if s_but.find("Print") >= 0:
+            if data.nbytes > 1024 * 100:
+                app.errorBox(f"DATA of {ttree}/{branch}", "Too big, try plotxx action instead !")
+                return
             try:
                 str_a = np.array2string(data)
             except:
-                if data.nbytes > 1024 ** 2:
-                    str_a = f"{data}"
-                else:
-                    str_a = f"{data.tolist()}"
+                # if data.nbytes > 1024 *100:
+                #     str_a = f"{data}"
+                # else:
+                #     str_a = f"{data.tolist()}"
+                str_a = f"{data.tolist()}"
             app.infoBox(f"DATA of {ttree}/{branch}", str_a)
+            if False:
+                # BOF
+                try:
+                    app.destroySubWindow("SW_PRINT")
+                except:
+                    pass
+                app.startSubWindow("SW_PRINT", f"DATA of {ttree}/{branch}", modal=True)
+                app.startScrollPane("PRINT_SCROLL", disabled="horizontal")
+                app.addMessage("D1", str_a)
+                app.stopScrollPane()
+                app.stopSubWindow()
+                app.showSubWindow("SW_PRINT")
         elif s_but.find("Plot1D") >= 0:
             plot1d_gui(app, data, f"{ttree}/{branch}")
         elif s_but.find("Plot2D") >= 0:
             app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
         elif s_but.find("Image") >= 0:
             app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
-            
-    app = gui()
+    
+    app = gui(handleArgs=False)
     app.setSize(1000, 600)
     # my_path = "/home/jcolley/temp/projet/grand_wk/data/root"
     # my_path = "/home/jcolley/temp"
-    #frt = app.openBox("BROOT open ROOT file", dirName=my_path, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
-    frt = app.openBox("BROOT open ROOT file", fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
-    if len(frt) == 0:
-        sys.exit(0)
-    drt = ur.open(frt)
+    # frt = app.openBox("BROOT open ROOT file", dirName=my_path, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
+    if r_file is None:
+        if d_file:
+            dir_search = d_file
+        else:
+            dir_search = os.getcwd()
+        r_file = app.openBox("BROOT open ROOT file", dirName=dir_search, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
+        if len(r_file) == 0:
+            sys.exit(0)
+    drt = ur.open(r_file)
     t_idx = 0
     l_ttree = list(drt.keys()).copy()
     l_ttree.sort()
+    
     all_branch = []
     app.startTabbedFrame("TabbedFrame")
-    app.setTitle(f"BROOT {frt}")
+    app.setTitle(f"BROOT {r_file}")
     app.setFont(18) 
     for idx_t, ttree in enumerate(l_ttree):
         fttree = ttree.split(';')[0]
-        app.startTab(fttree)
+        app.startTab(ttree)
         l_branch = list(drt[fttree].keys())
         l_branch.sort()
         all_branch.append(l_branch)
         tbl_br = []
         tbl_br.append(['ID', "Branch", "Value", "Type", "Shape", "Size [Byte]"])
         l_act = []
+        l_button = [f"Print", f"Plot1D", f"Plot2D", f"Image"]
         for idx0, branch in enumerate(l_branch):
             idx1 = idx0 + 1
             print(t_idx, idx0, branch)
@@ -213,8 +253,10 @@ def main_gui():
             tbl_br.append(new_line)
             # if idx > 5: break
             t_idx += 1            
-        l_button = [f"Print_{idx_t}", f"Plot1D_{idx_t}", f"Plot2D_{idx_t}", f"Image_{idx_t}"]
+        # l_button = [f"Print_{idx_t}", f"Plot1D_{idx_t}", f"Plot2D_{idx_t}", f"Image_{idx_t}"]
+       
         app.addTable(f"table{idx_t}", tbl_br, showMenu=True, action=main_action, actionButton=l_button)
+        # app.addTable(f"table2{idx_t}", tbl_br, showMenu=True, action=main_action, actionButton=l_button)
         app.stopTab()
     app.stopTabbedFrame()
     app.go()
@@ -222,6 +264,18 @@ def main_gui():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Browser for ROOT files from CERN collaboration.")
+    parser.add_argument(
+        "-d",
+        "--dir",
+        help="directory to ROOT files",type=pathlib.Path,
+        required=False
+    )
+    parser.add_argument(
+        "-f",
+        "--file",
+        help="path to ROOT file", type=argparse.FileType('r'),
+        required=False
+    )
     parser.add_argument(
         "-v",
         "--version",
@@ -231,6 +285,12 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     if args.version:
-        print(broot.__version__)
         sys.exit(0)
-    main_gui()
+    if args.file is not None:
+        main_gui(r_file=args.file.name)
+    elif args.dir is not None:
+        dir_root = os.path.abspath(args.dir)
+        assert os.path.exists(dir_root), f"{dir_root} doesn't exist !!"
+        main_gui(d_file= dir_root)
+    else:
+        main_gui()
