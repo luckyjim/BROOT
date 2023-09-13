@@ -9,7 +9,6 @@ import sys
 import os
 import os.path
 
-
 from appJar import gui
 import uproot as ur
 import matplotlib.pyplot as plt
@@ -17,6 +16,12 @@ import numpy as np
 import scipy.signal as ssig 
 
 import broot
+
+app = gui(handleArgs=False)
+dir_search = ""
+l_ttree = []
+all_branch = []
+drt = None
 
 
 def plot1d_gui(app, data, title=""):
@@ -132,87 +137,41 @@ def plot1d_gui(app, data, title=""):
     app.showSubWindow("one")
 
 
-def main_gui(r_file=None, d_file=None):
-    
-    def main_action(s_but, i_line):
-        '''
-        cette fonction est appelée quand l'utilisateur appuie sur un des boutons action
-        
-        
-        :param s_but: name of the buttom
-        :param i_line: line number associated with  buttom
-        '''
-        
-        # print(f"Call event_plot() with pars {s_but} {i_line}")
-        # for arg in argv:
-        #     print("Next argument through *argv :", arg)
-        # for key, value in kwargs.items():
-        #     print(f"{key}: {value}")
-        ttree_name = app.getTabbedFrameSelectedTab("TabbedFrame")
-        # print(ttree_name)
-        # id_t = int(s_but.split('_')[-1])
-        id_t = l_ttree.index(ttree_name)
-        ttree = l_ttree[id_t].split(';')[0]
-        branch = all_branch[id_t][i_line]
-        # print(f"{ttree} {branch}")
-        # print(type(ttree), type(branch))
-        data = drt[l_ttree[id_t]][branch].array()
-        try:
-            data = data.to_numpy()
-        except:
-            pass
-        if s_but.find("Print") >= 0:
-            if data.nbytes > 1024 * 100:
-                app.errorBox(f"DATA of {ttree}/{branch}", "Too big, try plotxx action instead !")
-                return
-            try:
-                str_a = np.array2string(data)
-            except:
-                # if data.nbytes > 1024 *100:
-                #     str_a = f"{data}"
-                # else:
-                #     str_a = f"{data.tolist()}"
-                str_a = f"{data.tolist()}"
-            app.infoBox(f"DATA of {ttree}/{branch}", str_a)
-            if False:
-                # BOF
-                try:
-                    app.destroySubWindow("SW_PRINT")
-                except:
-                    pass
-                app.startSubWindow("SW_PRINT", f"DATA of {ttree}/{branch}", modal=True)
-                app.startScrollPane("PRINT_SCROLL", disabled="horizontal")
-                app.addMessage("D1", str_a)
-                app.stopScrollPane()
-                app.stopSubWindow()
-                app.showSubWindow("SW_PRINT")
-        elif s_but.find("Plot1D") >= 0:
-            plot1d_gui(app, data, f"{ttree}/{branch}")
-        elif s_but.find("Plot2D") >= 0:
-            app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
-        elif s_but.find("Image") >= 0:
-            app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
-    
-    app = gui(handleArgs=False)
-    app.setSize(1000, 600)
-    # my_path = "/home/jcolley/temp/projet/grand_wk/data/root"
-    # my_path = "/home/jcolley/temp"
-    # frt = app.openBox("BROOT open ROOT file", dirName=my_path, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
-    if r_file is None:
-        if d_file:
-            dir_search = d_file
-        else:
-            dir_search = os.getcwd()
+def func_menu(s_but):
+    global app, drt
+    if s_but == "OFF":
+        sys.exit(0)
+    if s_but == "ABOUT":
+        app.infoBox(f"About BROOT", f"Version: {broot.__version__}")
+    if s_but == "CLOSE":
+        drt.close()
+        app.removeAllWidgets()
+        # for c_tab in G_ttrees:
+        #     print(f'delete {c_tab}')
+        #     app.deleteTabbedFrameTab("TabbedFrame", c_tab)
+        # G_ttrees = []
+    if s_but == "OPEN":
         r_file = app.openBox("BROOT open ROOT file", dirName=dir_search, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
-        if len(r_file) == 0:
-            sys.exit(0)
+        if len(r_file) != 0:
+            open_root_file(r_file)
+    
+
+def open_root_file(r_file):
+    global l_ttree, app, all_branch, drt
+    try:
+        drt.close()
+        app.removeAllWidgets()
+    except:
+        pass
     drt = ur.open(r_file)
     t_idx = 0
     l_ttree = list(drt.keys()).copy()
     l_ttree.sort()
-    
     all_branch = []
-    app.startTabbedFrame("TabbedFrame")
+    try:
+        ret = app.startTabbedFrame("TabbedFrame")
+    except:
+        pass
     app.setTitle(f"BROOT {r_file}")
     app.setFont(18) 
     for idx_t, ttree in enumerate(l_ttree):
@@ -259,6 +218,84 @@ def main_gui(r_file=None, d_file=None):
         # app.addTable(f"table2{idx_t}", tbl_br, showMenu=True, action=main_action, actionButton=l_button)
         app.stopTab()
     app.stopTabbedFrame()
+
+
+def main_action(s_but, i_line):
+    global app 
+    '''
+    cette fonction est appelée quand l'utilisateur appuie sur un des boutons action
+    
+    
+    :param s_but: name of the buttom
+    :param i_line: line number associated with  buttom
+    '''
+    
+    # print(f"Call event_plot() with pars {s_but} {i_line}")
+    # for arg in argv:
+    #     print("Next argument through *argv :", arg)
+    # for key, value in kwargs.items():
+    #     print(f"{key}: {value}")
+    ttree_name = app.getTabbedFrameSelectedTab("TabbedFrame")
+    # print(ttree_name)
+    # id_t = int(s_but.split('_')[-1])
+    id_t = l_ttree.index(ttree_name)
+    ttree = l_ttree[id_t].split(';')[0]
+    branch = all_branch[id_t][i_line]
+    # print(f"{ttree} {branch}")
+    # print(type(ttree), type(branch))
+    data = drt[l_ttree[id_t]][branch].array()
+    try:
+        data = data.to_numpy()
+    except:
+        pass
+    if s_but.find("Print") >= 0:
+        if data.nbytes > 1024 * 100:
+            app.errorBox(f"DATA of {ttree}/{branch}", "Too big, try plotxx action instead !")
+            return
+        try:
+            str_a = np.array2string(data)
+        except:
+            # if data.nbytes > 1024 *100:
+            #     str_a = f"{data}"
+            # else:
+            #     str_a = f"{data.tolist()}"
+            str_a = f"{data.tolist()}"
+        app.infoBox(f"DATA of {ttree}/{branch}", str_a)
+        if False:
+            # BOF
+            try:
+                app.destroySubWindow("SW_PRINT")
+            except:
+                pass
+            app.startSubWindow("SW_PRINT", f"DATA of {ttree}/{branch}", modal=True)
+            app.startScrollPane("PRINT_SCROLL", disabled="horizontal")
+            app.addMessage("D1", str_a)
+            app.stopScrollPane()
+            app.stopSubWindow()
+            app.showSubWindow("SW_PRINT")
+    elif s_but.find("Plot1D") >= 0:
+        plot1d_gui(app, data, f"{ttree}/{branch}")
+    elif s_but.find("Plot2D") >= 0:
+        app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
+    elif s_but.find("Image") >= 0:
+        app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
+    
+
+def main_gui(r_file=None, d_file=None):
+    global app 
+    
+    tools = ["OPEN", "CLOSE", "ABOUT", "OFF"]
+    app.addToolbar(tools, func_menu, findIcon=True)
+    app.setSize(1100, 600)   
+    if r_file is None:
+        if d_file:
+            dir_search = d_file
+        else:
+            dir_search = os.getcwd()
+        r_file = app.openBox("BROOT open ROOT file", dirName=dir_search, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
+        if len(r_file) == 0:
+            sys.exit(0)
+    open_root_file(r_file)
     app.go()
 
 
@@ -279,12 +316,13 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     if args.version:
+        print(broot.__version__)
         sys.exit(0)
     if args.file is not None:
         abs_file = os.path.abspath(args.file)
         assert os.path.exists(abs_file), f"'{abs_file}' doesn't exist !!"
         if os.path.isdir(abs_file):
-            main_gui(d_file= abs_file)
+            main_gui(d_file=abs_file)
         else:
             main_gui(r_file=abs_file)
     else:
