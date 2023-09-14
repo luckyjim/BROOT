@@ -145,8 +145,7 @@ def plot1d_gui(app, data, title=""):
 
 def func_menu(s_but):
     global app, drt
-    if s_but == "OFF":
-        sys.exit(0)
+    
     if s_but == "ABOUT":
         app.infoBox(f"About BROOT", f"Version: {broot.__version__}")
     if s_but == "CLOSE":
@@ -290,7 +289,7 @@ def main_action(s_but, i_line):
 def main_gui(r_file=None, d_file=None):
     global app 
     
-    tools = ["OPEN", "CLOSE", "ABOUT", "OFF"]
+    tools = ["OPEN", "CLOSE", "ABOUT"]
     app.addToolbar(tools, func_menu, findIcon=True)
     app.setSize(1100, 600)   
     if r_file is None:
