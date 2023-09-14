@@ -184,7 +184,7 @@ def open_root_file(r_file):
         fttree = ttree.split(';')[0]
         app.startTab(ttree)
         l_branch = list(drt[fttree].keys())
-        l_branch.sort()
+        #l_branch.sort()
         all_branch.append(l_branch)
         tbl_br = []
         tbl_br.append(['ID', "Branch", "Value", "Type", "Shape", "Size [Byte]"])
