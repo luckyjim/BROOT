@@ -3,6 +3,12 @@
 Created on 19 juil. 2023
 
 @author: jcolley
+
+a faire:
+ *  memoriser le dernier répertoire de lecture 
+ * renommage pour global
+ * fichier Atlas pb affichage PLOT_1D
+
 '''
 import argparse
 import sys
