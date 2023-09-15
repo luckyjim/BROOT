@@ -1,11 +1,11 @@
 #! /usr/bin/env python3
+
 '''
 Created on 19 juil. 2023
 
 @author: jcolley
 
 a faire:
- *  memoriser le dernier répertoire de lecture 
  * fichier Atlas pb affichage PLOT_1D
 
 '''
@@ -142,16 +142,17 @@ def plot1d_gui(app, data, title=""):
 
 
 def func_menu(s_but):
-    global g_app, g_froot
+    global g_app, g_froot, g_path_file
     
     if s_but == "ABOUT":
-        g_app.infoBox(f"About BROOT", f"Version: {broot.__version__}")
+        g_app.infoBox(f"About BROOT", f"Version: {broot.__version__}\n\nAuthor: Colley Jean-Marc")
     if s_but == "CLOSE":
         g_froot.close()
         g_app.removeAllWidgets()
     if s_but == "OPEN":
         r_file = g_app.openBox("BROOT open ROOT file", dirName=g_path_file, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
         if len(r_file) != 0:
+            g_path_file = os.path.dirname(r_file)
             open_root_file(r_file)
     
 
@@ -253,7 +254,7 @@ def main_action(s_but, i_line):
     
 
 def main_gui(r_file=None, d_file=None):
-    global g_app 
+    global g_app, g_path_file
     
     tools = ["OPEN", "CLOSE", "ABOUT"]
     g_app.addToolbar(tools, func_menu, findIcon=True)
@@ -266,6 +267,7 @@ def main_gui(r_file=None, d_file=None):
         r_file = g_app.openBox("BROOT open ROOT file", dirName=g_path_file, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
         if len(r_file) == 0:
             sys.exit(0)
+    g_path_file = os.path.dirname(r_file)
     open_root_file(r_file)
     g_app.go()
 
