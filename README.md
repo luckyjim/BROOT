@@ -17,21 +17,21 @@ BROOT doesn't use the ROOT library but the IO-specific library [uproot](https://
 
 ![BROOT_print](docs/BROOT_print.png)
 
-## Basic plots
+### Basic plots
 
 Range of plot is configurable with GUI, same syntax as [numpy](https://numpy.org/doc/stable/user/basics.indexing.html#basic-indexing) array. [Matplotlib](https://matplotlib.org/) is used to create the figures.
 
-### Plot 1D
+#### Plot 1D
 
 ![BROOT_1d](docs/BROOT_plot_1d.png)
 
-### Power spectrum density
+#### Power spectrum density
 
 You can configure the frequency of sampling with GUI.
 
 ![BROOT_1d](docs/BROOT_psd.png)
 
-### Histogram
+#### Histogram
 
 ![BROOT_1d](docs/BROOT_histo.png)
 
