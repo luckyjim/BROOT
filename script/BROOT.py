@@ -6,7 +6,6 @@ Created on 19 juil. 2023
 
 a faire:
  *  memoriser le dernier répertoire de lecture 
- * renommage pour global
  * fichier Atlas pb affichage PLOT_1D
 
 '''
@@ -23,11 +22,15 @@ import scipy.signal as ssig
 
 import broot
 
-app = gui(handleArgs=False)
-dir_search = ""
-l_ttree = []
-all_branch = []
-drt = None
+#
+# GLOBAL
+#
+g_app = gui(handleArgs=False)
+g_path_file = ""
+g_ttres = []
+g_branches = []
+# file root open with uproot
+g_froot = None
 
 
 def plot1d_gui(app, data, title=""):
@@ -49,8 +52,6 @@ def plot1d_gui(app, data, title=""):
         return True, plot_d, s_idx
         
     def press_plot1D(pars):
-        # print(app.getRadioButton("PLOT"))
-        # print(app.getRadioButton("OPTION_0"))
         f_conv , data_1d , s_idx = get_slice_array()
         if not f_conv: return
         plt.figure()
@@ -64,9 +65,9 @@ def plot1d_gui(app, data, title=""):
         f_conv , data_1d , s_idx = get_slice_array()
         if not f_conv: return
         try:
-            freq = float(app.getEntry(e_freq))
+            freq = float(g_app.getEntry(e_freq))
         except:
-            app.errorBox("ERROR", f"{e_freq} must be a number.\nFix to 1 Hz")
+            g_app.errorBox("ERROR", f"{e_freq} must be a number.\nFix to 1 Hz")
             freq = 1
         plt.figure()
         plt.title(title + f",PSD for range [{s_idx}]")
@@ -90,115 +91,109 @@ def plot1d_gui(app, data, title=""):
         plt.hist(data_1d.ravel(), log=True)
         plt.grid()
         plt.show()
-             
-    # def press_cancel(pars):
-    #     app.destroySubWindow("one")
-    
+        
     try:
-        app.destroySubWindow("one")
+        g_app.destroySubWindow("one")
     except:
         pass
-    app.startSubWindow("one", f"Plot {title}", modal=True, blocking=True)
-    app.setSize(1000, 300)
-    app.setExpand("both")
+    g_app.startSubWindow("one", f"Plot {title}", modal=True, blocking=True)
+    g_app.setSize(1000, 300)
+    g_app.setExpand("both")
     ndim = data.ndim
     # Col 0
-    app.startFrame("LEFT", row=0, column=0)
+    g_app.startFrame("LEFT", row=0, column=0)
     try:
-        app.addLabel(f"Range {data.shape}", row=0, column=0)
+        g_app.addLabel(f"Range {data.shape}", row=0, column=0)
     except:
-        app.addLabel(f"Range irregular", row=0, column=0)
+        g_app.addLabel(f"Range irregular", row=0, column=0)
     def_val = 0
     for idx in range(ndim):
         n_entry = f"dim {idx}"
-        app.addLabelEntry(n_entry, row=idx + 1, column=0)
+        g_app.addLabelEntry(n_entry, row=idx + 1, column=0)
         if (idx + 1) == ndim:
             def_val = ":"
-        app.setEntry(n_entry, def_val)
-    app.stopFrame()
+        g_app.setEntry(n_entry, def_val)
+    g_app.stopFrame()
     if False:
         # Col 1
-        app.startFrame("MIDDLE", row=0, column=1)
-        app.addLabel("Plot", row=0, column=0)
+        g_app.startFrame("MIDDLE", row=0, column=1)
+        g_app.addLabel("Plot", row=0, column=0)
         for idx in range(ndim):
-            app.addRadioButton("PLOT", f"{idx}", row=idx + 1, column=0)
-        app.stopFrame()
+            g_app.addRadioButton("PLOT", f"{idx}", row=idx + 1, column=0)
+        g_app.stopFrame()
         # Col 2
-        app.startFrame("RIGHT", row=0, column=2)
-        app.addLabel("Option", row=0, colspan=4)
+        g_app.startFrame("RIGHT", row=0, column=2)
+        g_app.addLabel("Option", row=0, colspan=4)
         for idx in range(ndim):
-            app.addRadioButton(f"OPTION_{idx}", "Same", row=idx + 1, column=0)
-            app.addRadioButton(f"OPTION_{idx}", "Sub", row=idx + 1, column=1)
-            app.addRadioButton(f"OPTION_{idx}", "Slide", row=idx + 1, column=3)
-            app.addRadioButton(f"OPTION_{idx}", "New", row=idx + 1, column=4)
-        app.stopFrame()
+            g_app.addRadioButton(f"OPTION_{idx}", "Same", row=idx + 1, column=0)
+            g_app.addRadioButton(f"OPTION_{idx}", "Sub", row=idx + 1, column=1)
+            g_app.addRadioButton(f"OPTION_{idx}", "Slide", row=idx + 1, column=3)
+            g_app.addRadioButton(f"OPTION_{idx}", "New", row=idx + 1, column=4)
+        g_app.stopFrame()
     e_freq = "Freq. sampling Hz"
-    app.addLabelEntry(e_freq, column=1)
-    app.setEntry(e_freq, 1.0)  
+    g_app.addLabelEntry(e_freq, column=1)
+    g_app.setEntry(e_freq, 1.0)  
     offset_row = 3
-    app.addButton("Plot1D", press_plot1D, row=ndim + offset_row, column=0)
-    app.addButton("Spectrum", press_spectrum, row=ndim + offset_row, column=1)
-    app.addButton("Histogram", press_histo, row=ndim + offset_row, column=2)
-    app.stopSubWindow()
-    app.showSubWindow("one")
+    g_app.addButton("Plot1D", press_plot1D, row=ndim + offset_row, column=0)
+    g_app.addButton("Spectrum", press_spectrum, row=ndim + offset_row, column=1)
+    g_app.addButton("Histogram", press_histo, row=ndim + offset_row, column=2)
+    g_app.stopSubWindow()
+    g_app.showSubWindow("one")
 
 
 def func_menu(s_but):
-    global app, drt
+    global g_app, g_froot
     
     if s_but == "ABOUT":
-        app.infoBox(f"About BROOT", f"Version: {broot.__version__}")
+        g_app.infoBox(f"About BROOT", f"Version: {broot.__version__}")
     if s_but == "CLOSE":
-        drt.close()
-        app.removeAllWidgets()
-        # for c_tab in G_ttrees:
-        #     print(f'delete {c_tab}')
-        #     app.deleteTabbedFrameTab("TabbedFrame", c_tab)
-        # G_ttrees = []
+        g_froot.close()
+        g_app.removeAllWidgets()
     if s_but == "OPEN":
-        r_file = app.openBox("BROOT open ROOT file", dirName=dir_search, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
+        r_file = g_app.openBox("BROOT open ROOT file", dirName=g_path_file, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
         if len(r_file) != 0:
             open_root_file(r_file)
     
 
 def open_root_file(r_file):
-    global l_ttree, app, all_branch, drt
+    global g_ttres, g_app, g_branches, g_froot
+    
     try:
-        drt.close()
-        app.removeAllWidgets()
+        g_froot.close()
+        g_app.removeAllWidgets()
     except:
         pass
-    drt = ur.open(r_file)
+    g_froot = ur.open(r_file)
     t_idx = 0
-    l_ttree = list(drt.keys()).copy()
-    l_ttree.sort()
-    all_branch = []
+    g_ttres = list(g_froot.keys()).copy()
+    g_ttres.sort()
+    g_branches = []
     try:
-        ret = app.startTabbedFrame("TabbedFrame")
+        ret = g_app.startTabbedFrame("TabbedFrame")
     except:
         pass
-    app.setTitle(f"BROOT {r_file}")
-    app.setFont(18) 
-    for idx_t, ttree in enumerate(l_ttree):
+    g_app.setTitle(f"BROOT {r_file}")
+    g_app.setFont(18) 
+    for idx_t, ttree in enumerate(g_ttres):
         fttree = ttree.split(';')[0]
-        app.startTab(ttree)
-        l_branch = list(drt[fttree].keys())
-        #l_branch.sort()
-        all_branch.append(l_branch)
+        g_app.startTab(ttree)
+        l_branch = list(g_froot[fttree].keys())
+        g_branches.append(l_branch)
         tbl_br = []
         tbl_br.append(['ID', "Branch", "Value", "Type", "Shape", "Size [Byte]"])
         l_act = []
         l_button = [f"Print", f"Plot1D", f"Plot2D", f"Image"]
         for idx0, branch in enumerate(l_branch):
             idx1 = idx0 + 1
+            s_idx1 = f"{idx1:03}"
             print(t_idx, idx0, branch)
             print("Please wait, reading TBranch ...")  
             l_act.append(f"Plot_{ttree}")
-            val_br = drt[ttree][branch].array()            
+            val_br = g_froot[ttree][branch].array()            
             try:
                 # NUMPY array
                 np_br = val_br.to_numpy()                
-                new_line = [idx1, f"{branch}", f"Array! Try Action", f"{np_br.dtype}", f"{np_br.shape}", f"{np_br.nbytes:,}"]
+                new_line = [s_idx1, f"{branch}", f"Array! Try Action", f"{np_br.dtype}", f"{np_br.shape}", f"{np_br.nbytes:,}"]
                 if np_br.size == 0:
                     new_line[2] = f"Empty !?"
                 if np_br.size == 1:
@@ -213,97 +208,71 @@ def open_root_file(r_file):
                 a_type_s = val_br.typestr.split('*')
                 a_shape = '(' + ','.join(a_type_s[:-1]) + ')' 
                 a_shape = a_shape.replace(' ', '')
-                new_line = [idx1, f"{branch}", f"Array! Try Action", f"{a_type_s[-1].strip()}", f"{a_shape}", f"{val_br.nbytes:,}"]
+                new_line = [s_idx1, f"{branch}", f"Array! Try Action", f"{a_type_s[-1].strip()}", f"{a_shape}", f"{val_br.nbytes:,}"]
             tbl_br.append(new_line)
             # if idx > 5: break
             t_idx += 1            
-        # l_button = [f"Print_{idx_t}", f"Plot1D_{idx_t}", f"Plot2D_{idx_t}", f"Image_{idx_t}"]
-       
-        app.addTable(f"table{idx_t}", tbl_br, showMenu=True, action=main_action, actionButton=l_button)
-        # app.addTable(f"table2{idx_t}", tbl_br, showMenu=True, action=main_action, actionButton=l_button)
-        app.stopTab()
-    app.stopTabbedFrame()
+        g_app.addTable(f"table{idx_t}", tbl_br, showMenu=True, action=main_action, actionButton=l_button)    
+        g_app.stopTab()
+    g_app.stopTabbedFrame()
 
 
 def main_action(s_but, i_line):
-    global app 
     '''
     cette fonction est appelée quand l'utilisateur appuie sur un des boutons action
-    
     
     :param s_but: name of the buttom
     :param i_line: line number associated with  buttom
     '''
-    
-    # print(f"Call event_plot() with pars {s_but} {i_line}")
-    # for arg in argv:
-    #     print("Next argument through *argv :", arg)
-    # for key, value in kwargs.items():
-    #     print(f"{key}: {value}")
-    ttree_name = app.getTabbedFrameSelectedTab("TabbedFrame")
-    # print(ttree_name)
-    # id_t = int(s_but.split('_')[-1])
-    id_t = l_ttree.index(ttree_name)
-    ttree = l_ttree[id_t].split(';')[0]
-    branch = all_branch[id_t][i_line]
-    # print(f"{ttree} {branch}")
-    # print(type(ttree), type(branch))
-    data = drt[l_ttree[id_t]][branch].array()
+    global g_app 
+
+    ttree_name = g_app.getTabbedFrameSelectedTab("TabbedFrame")
+    id_t = g_ttres.index(ttree_name)
+    ttree = g_ttres[id_t].split(';')[0]
+    branch = g_branches[id_t][i_line]
+    data = g_froot[g_ttres[id_t]][branch].array()
     try:
         data = data.to_numpy()
     except:
         pass
     if s_but.find("Print") >= 0:
         if data.nbytes > 1024 * 100:
-            app.errorBox(f"DATA of {ttree}/{branch}", "Too big, try plotxx action instead !")
+            g_app.errorBox(f"DATA of {ttree}/{branch}", "Too big, try plotxx action instead !")
             return
         try:
             str_a = np.array2string(data)
         except:
-            # if data.nbytes > 1024 *100:
-            #     str_a = f"{data}"
-            # else:
-            #     str_a = f"{data.tolist()}"
             str_a = f"{data.tolist()}"
-        app.infoBox(f"DATA of {ttree}/{branch}", str_a)
-        if False:
-            # BOF
-            try:
-                app.destroySubWindow("SW_PRINT")
-            except:
-                pass
-            app.startSubWindow("SW_PRINT", f"DATA of {ttree}/{branch}", modal=True)
-            app.startScrollPane("PRINT_SCROLL", disabled="horizontal")
-            app.addMessage("D1", str_a)
-            app.stopScrollPane()
-            app.stopSubWindow()
-            app.showSubWindow("SW_PRINT")
+        g_app.infoBox(f"DATA of {ttree}/{branch}", str_a)
     elif s_but.find("Plot1D") >= 0:
-        plot1d_gui(app, data, f"{ttree}/{branch}")
+        plot1d_gui(g_app, data, f"{ttree}/{branch}")
     elif s_but.find("Plot2D") >= 0:
-        app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
+        g_app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
     elif s_but.find("Image") >= 0:
-        app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
+        g_app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
     
 
 def main_gui(r_file=None, d_file=None):
-    global app 
+    global g_app 
     
     tools = ["OPEN", "CLOSE", "ABOUT"]
-    app.addToolbar(tools, func_menu, findIcon=True)
-    app.setSize(1100, 600)   
+    g_app.addToolbar(tools, func_menu, findIcon=True)
+    g_app.setSize(1100, 600)   
     if r_file is None:
         if d_file:
-            dir_search = d_file
+            g_path_file = d_file
         else:
-            dir_search = os.getcwd()
-        r_file = app.openBox("BROOT open ROOT file", dirName=dir_search, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
+            g_path_file = os.getcwd()
+        r_file = g_app.openBox("BROOT open ROOT file", dirName=g_path_file, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
         if len(r_file) == 0:
             sys.exit(0)
     open_root_file(r_file)
-    app.go()
+    g_app.go()
 
 
+#
+# MAIN
+#
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Browser for ROOT files from CERN collaboration.")
     parser.add_argument(

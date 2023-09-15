@@ -15,7 +15,21 @@ data = [["Homer", "Simpson", "America", 40],
         ["Maggie", "Simpson", "America", 4],
         ["Bart", "Simpson", "America", 14]]
 
-
+def test_scroll():
+    g_app = gui()
+    if False:
+        # BOF
+        try:
+            g_app.destroySubWindow("SW_PRINT")
+        except:
+            pass
+        g_app.startSubWindow("SW_PRINT", f"DATA ", modal=True)
+        g_app.startScrollPane("PRINT_SCROLL", disabled="horizontal")
+        g_app.addMessage("D1", "test")
+        g_app.stopScrollPane()
+        g_app.stopSubWindow()
+        g_app.showSubWindow("SW_PRINT")
+    
 def test_01(): 
     app = gui()
     app.addLabel("title", "Hello World")
