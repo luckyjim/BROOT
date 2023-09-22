@@ -149,6 +149,7 @@ def func_menu(s_but):
     if s_but == "CLOSE":
         g_froot.close()
         g_app.removeAllWidgets()
+        g_app.setTitle(f"BROOT no file")
     if s_but == "OPEN":
         r_file = g_app.openBox("BROOT open ROOT file", dirName=g_path_file, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
         if len(r_file) != 0:
