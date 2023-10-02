@@ -64,4 +64,9 @@ pip install --upgrade setuptools pip
 ```
 
 
+# Update version
 
+```
+python -m pip uninstall BROOT
+python -m pip install git+https://github.com/luckyjim/BROOT.git 
+ ```
