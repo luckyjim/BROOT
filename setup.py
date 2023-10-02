@@ -15,7 +15,7 @@ setup(
         "Topic :: Scientific/Engineering :: Physics",
     ],
     url="https://github.com/luckyjim/BROOT",
-    package_dir={"broot": "src/broot"},
+    package_dir={"broot": "src/broot", "ndarray_view":"src/ndarray_view"},
     scripts=["script/BROOT.py"],
     license='MIT',
     python_requires='>=3.7',
