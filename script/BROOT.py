@@ -21,13 +21,15 @@ import numpy as np
 import scipy.signal as ssig 
 
 import broot
+import ndarray_view.image as v_ima
+
 
 #
 # GLOBAL
 #
 g_app = gui(handleArgs=False)
 g_path_file = ""
-g_ttres = []
+g_ttrees = []
 g_branches = []
 # file root open with uproot
 g_froot = None
@@ -93,10 +95,10 @@ def plot1d_gui(app, data, title=""):
         plt.show()
         
     try:
-        g_app.destroySubWindow("one")
+        g_app.destroySubWindow("plot1d")
     except:
         pass
-    g_app.startSubWindow("one", f"Plot {title}", modal=True, blocking=True)
+    g_app.startSubWindow("plot1d", f"BROOT Plot {title}", modal=True, blocking=True)
     g_app.setSize(1000, 300)
     g_app.setExpand("both")
     ndim = data.ndim
@@ -106,6 +108,8 @@ def plot1d_gui(app, data, title=""):
         g_app.addLabel(f"Range {data.shape}", row=0, column=0)
     except:
         g_app.addLabel(f"Range irregular", row=0, column=0)
+    # 0 est la valeur par defaut pour les premieres dimension
+    # la derniere dimension est :
     def_val = 0
     for idx in range(ndim):
         n_entry = f"dim {idx}"
@@ -138,7 +142,7 @@ def plot1d_gui(app, data, title=""):
     g_app.addButton("Spectrum", press_spectrum, row=ndim + offset_row, column=1)
     g_app.addButton("Histogram", press_histo, row=ndim + offset_row, column=2)
     g_app.stopSubWindow()
-    g_app.showSubWindow("one")
+    g_app.showSubWindow("plot1d")
 
 
 def func_menu(s_but):
@@ -158,7 +162,7 @@ def func_menu(s_but):
     
 
 def open_root_file(r_file):
-    global g_ttres, g_app, g_branches, g_froot
+    global g_ttrees, g_app, g_branches, g_froot
     
     try:
         g_froot.close()
@@ -167,16 +171,16 @@ def open_root_file(r_file):
         pass
     g_froot = ur.open(r_file)
     t_idx = 0
-    g_ttres = list(g_froot.keys()).copy()
-    g_ttres.sort()
+    g_ttrees = list(g_froot.keys()).copy()
+    g_ttrees.sort()
     g_branches = []
     try:
-        ret = g_app.startTabbedFrame("TabbedFrame")
+        ret = g_app.startTabbedFrame("TTreeTabs")
     except:
         pass
     g_app.setTitle(f"BROOT {r_file}")
     g_app.setFont(18) 
-    for idx_t, ttree in enumerate(g_ttres):
+    for idx_t, ttree in enumerate(g_ttrees):
         fttree = ttree.split(';')[0]
         g_app.startTab(ttree)
         l_branch = list(g_froot[fttree].keys())
@@ -228,11 +232,14 @@ def main_action(s_but, i_line):
     '''
     global g_app 
 
-    ttree_name = g_app.getTabbedFrameSelectedTab("TabbedFrame")
-    id_t = g_ttres.index(ttree_name)
-    ttree = g_ttres[id_t].split(';')[0]
-    branch = g_branches[id_t][i_line]
-    data = g_froot[g_ttres[id_t]][branch].array()
+    ttree_name = g_app.getTabbedFrameSelectedTab("TTreeTabs")
+    id_t = g_ttrees.index(ttree_name)
+    ttree = g_ttrees[id_t].split(';')[0]
+    #branch = g_branches[id_t][i_line]
+    pars_line = g_app.getTableRow(f"table{id_t}", i_line)
+    branch = pars_line[1]
+    print(branch)
+    data = g_froot[g_ttrees[id_t]][branch].array()
     try:
         data = data.to_numpy()
     except:
@@ -252,7 +259,7 @@ def main_action(s_but, i_line):
         g_app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
     elif s_but.find("Image") >= 0:
         g_app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
-    
+        #v_ima.gui_view_image(g_app, data, f"{ttree}/{branch}")
 
 def main_gui(r_file=None, d_file=None):
     global g_app, g_path_file
