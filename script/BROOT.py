@@ -18,11 +18,10 @@ from appJar import gui
 import uproot as ur
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.signal as ssig 
 
 import broot
 import ndarray_view.image as v_ima
-
+import ndarray_view.plot1d as v_p1d
 
 #
 # GLOBAL
@@ -33,116 +32,6 @@ g_ttrees = []
 g_branches = []
 # file root open with uproot
 g_froot = None
-
-
-def plot1d_gui(app, data, title=""):
-    
-    def get_slice_array():
-        s_idx = ""
-        for idx in range(ndim):
-            s_rge = app.getEntry(f'dim {idx}')
-            s_idx += f"{s_rge},"
-        s_idx = s_idx[:-1]
-        slice_ = eval(f'np.s_[{s_idx}]')
-        try:
-            plot_d = data[slice_]
-        except:
-            app.errorBox("ERROR", f"Slice {s_idx} not valid ?")
-            return False, None, s_idx
-        if not isinstance(plot_d, np.ndarray):
-            plot_d = plot_d.to_numpy()
-        return True, plot_d, s_idx
-        
-    def press_plot1D(pars):
-        f_conv , data_1d , s_idx = get_slice_array()
-        if not f_conv: return
-        plt.figure()
-        plt.title(title + f", range [{s_idx}]")
-        plt.plot(data_1d.ravel())
-        plt.xlabel('Sample')
-        plt.grid()
-        plt.show()
-        
-    def press_spectrum(pars):
-        f_conv , data_1d , s_idx = get_slice_array()
-        if not f_conv: return
-        try:
-            freq = float(g_app.getEntry(e_freq))
-        except:
-            g_app.errorBox("ERROR", f"{e_freq} must be a number.\nFix to 1 Hz")
-            freq = 1
-        plt.figure()
-        plt.title(title + f",PSD for range [{s_idx}]")
-        freq, pxx_den = ssig.welch(
-                        data_1d.ravel(),
-                        freq,
-                        window="taylor",
-                        scaling="density",
-                    )
-        plt.semilogy(freq[2:], pxx_den[2:])
-        plt.ylabel(rf"(Unit$^2$/Hz")
-        plt.xlabel(f"Hz")
-        plt.grid()
-        plt.show()
-
-    def press_histo(pars):
-        f_conv , data_1d , s_idx = get_slice_array()
-        if not f_conv: return
-        plt.figure()
-        plt.title(title + f",histogram for range [{s_idx}]")
-        plt.hist(data_1d.ravel(), log=True)
-        plt.grid()
-        plt.show()
-        
-    try:
-        g_app.destroySubWindow("plot1d")
-    except:
-        pass
-    g_app.startSubWindow("plot1d", f"BROOT Plot {title}", modal=True, blocking=True)
-    g_app.setSize(1000, 300)
-    g_app.setExpand("both")
-    ndim = data.ndim
-    # Col 0
-    g_app.startFrame("LEFT", row=0, column=0)
-    try:
-        g_app.addLabel(f"Range {data.shape}", row=0, column=0)
-    except:
-        g_app.addLabel(f"Range irregular", row=0, column=0)
-    # 0 est la valeur par defaut pour les premieres dimension
-    # la derniere dimension est :
-    def_val = 0
-    for idx in range(ndim):
-        n_entry = f"dim {idx}"
-        g_app.addLabelEntry(n_entry, row=idx + 1, column=0)
-        if (idx + 1) == ndim:
-            def_val = ":"
-        g_app.setEntry(n_entry, def_val)
-    g_app.stopFrame()
-    if False:
-        # Col 1
-        g_app.startFrame("MIDDLE", row=0, column=1)
-        g_app.addLabel("Plot", row=0, column=0)
-        for idx in range(ndim):
-            g_app.addRadioButton("PLOT", f"{idx}", row=idx + 1, column=0)
-        g_app.stopFrame()
-        # Col 2
-        g_app.startFrame("RIGHT", row=0, column=2)
-        g_app.addLabel("Option", row=0, colspan=4)
-        for idx in range(ndim):
-            g_app.addRadioButton(f"OPTION_{idx}", "Same", row=idx + 1, column=0)
-            g_app.addRadioButton(f"OPTION_{idx}", "Sub", row=idx + 1, column=1)
-            g_app.addRadioButton(f"OPTION_{idx}", "Slide", row=idx + 1, column=3)
-            g_app.addRadioButton(f"OPTION_{idx}", "New", row=idx + 1, column=4)
-        g_app.stopFrame()
-    e_freq = "Freq. sampling Hz"
-    g_app.addLabelEntry(e_freq, column=1)
-    g_app.setEntry(e_freq, 1.0)  
-    offset_row = 3
-    g_app.addButton("Plot1D", press_plot1D, row=ndim + offset_row, column=0)
-    g_app.addButton("Spectrum", press_spectrum, row=ndim + offset_row, column=1)
-    g_app.addButton("Histogram", press_histo, row=ndim + offset_row, column=2)
-    g_app.stopSubWindow()
-    g_app.showSubWindow("plot1d")
 
 
 def func_menu(s_but):
@@ -235,7 +124,7 @@ def main_action(s_but, i_line):
     ttree_name = g_app.getTabbedFrameSelectedTab("TTreeTabs")
     id_t = g_ttrees.index(ttree_name)
     ttree = g_ttrees[id_t].split(';')[0]
-    #branch = g_branches[id_t][i_line]
+    # branch = g_branches[id_t][i_line]
     pars_line = g_app.getTableRow(f"table{id_t}", i_line)
     branch = pars_line[1]
     print(branch)
@@ -254,12 +143,13 @@ def main_action(s_but, i_line):
             str_a = f"{data.tolist()}"
         g_app.infoBox(f"DATA of {ttree}/{branch}", str_a)
     elif s_but.find("Plot1D") >= 0:
-        plot1d_gui(g_app, data, f"{ttree}/{branch}")
+        v_p1d.gui_view_plot1d(g_app, data, f"{ttree}/{branch}")
     elif s_but.find("Plot2D") >= 0:
         g_app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
     elif s_but.find("Image") >= 0:
-        g_app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
-        #v_ima.gui_view_image(g_app, data, f"{ttree}/{branch}")
+        # g_app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
+        v_ima.gui_view_image(g_app, data, f"{ttree}/{branch}")
+
 
 def main_gui(r_file=None, d_file=None):
     global g_app, g_path_file

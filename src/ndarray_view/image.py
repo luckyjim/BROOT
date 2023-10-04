@@ -5,7 +5,6 @@ Created on 29 sept. 2023
 '''
 
 from appJar import gui
-import uproot as ur
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -14,27 +13,59 @@ def gui_view_image(a_gui, data, title=""):
     
     def get_slice_array():
         s_idx = ""
+        f_transp = None
+        f_nodef_x = True
+        f_nodef_y = True
         for idx in range(ndim):
-            s_rge = a_gui.getEntry(f'dim {idx}')
-            s_idx += f"{s_rge},"
+            s_rge = a_gui.getEntry(f'ima_dim {idx}').replace(" ", "")
+            print(s_rge)
+            if s_rge[0] == "x":
+                if s_rge[1:] == "":
+                    s_idx += f":,"
+                else:
+                    s_idx += f"{s_rge[1:]},"
+                f_transp = False
+                f_nodef_x = False
+            elif  s_rge[0] == "y":
+                if s_rge[1:] == "":
+                    s_idx += f":,"
+                else:
+                    s_idx += f"{s_rge[1:]},"
+                f_transp = True
+                f_nodef_y = False
+            else:
+                s_idx += f"{s_rge},"
+            print(s_idx)
+        # remove last ,
+        if f_nodef_x or f_nodef_y:
+            a_gui.errorBox(title, "You must define x and y")
+            return False, None, None, None
         s_idx = s_idx[:-1]
-        slice_ = eval(f'np.s_[{s_idx}]')
         try:
-            plot_d = data[slice_]
+            slice_ = eval(f'np.s_[{s_idx}]')
+            a_image = data[slice_]
         except:
             a_gui.errorBox("ERROR", f"Slice {s_idx} not valid ?")
-            return False, None, s_idx
-        if not isinstance(plot_d, np.ndarray):
-            plot_d = plot_d.to_numpy()
-        return True, plot_d, s_idx
+            return False, None, s_idx, f_transp
+        if not isinstance(a_image, np.ndarray):
+            try:
+                a_image = a_image.to_numpy()
+            except:
+                a_gui.errorBox(title, "Can't convert in regular array")
+                return False, a_image, s_idx , f_transp
+        return True, a_image, s_idx , f_transp
         
-    def press_image(pars):
-        f_conv , data_2d , s_idx = get_slice_array()
-        if not f_conv: return
+    def press_image():
+        f_conv , data_2d , s_idx, f_transp = get_slice_array()
+        if not f_conv:
+            return 
+        if f_transp :
+            data_2d = data_2d.transpose()
         plt.figure()
         plt.title(title + f", range [{s_idx}]")
         plt.imshow(data_2d)
-        plt.xlabel('Sample')
+        plt.xlabel('x')
+        plt.ylabel('y')
         plt.grid()
         plt.show()
 
@@ -46,18 +77,23 @@ def gui_view_image(a_gui, data, title=""):
     a_gui.setSize(1000, 300)
     a_gui.setExpand("both")
     ndim = data.ndim
+    if ndim  <= 1: 
+        a_gui.errorBox(title, "Dimension of array must be => 2.")
+        return 
     # Col 0
-    a_gui.startFrame("LEFT_IMA", row=0, column=0)
+    a_gui.startFrame("ima_LEFT", row=0, column=0)
     try:
-        a_gui.addLabel(f"Range {data.shape}", row=0, column=0)
+        str_range = f"Range {data.shape}"
     except:
-        a_gui.addLabel(f"Range irregular", row=0, column=0)
+        str_range = "Range irregular"
+    a_gui.addLabel("ima_range",str_range, row=0, column=0)   
+
     for idx in range(ndim):
-        n_entry = f"dim {idx}"
-        a_gui.addLabelEntry(n_entry, row=idx + 1, column=0)
+        n_entry = f"ima_dim {idx}"
+        a_gui.addLabelEntry(n_entry, row=idx + 1, column=0, label=f"dim {idx}")
         if idx == 0:
             a_gui.setEntry(n_entry, 'x')
-        elif idx ==1:
+        elif idx == 1:
             a_gui.setEntry(n_entry, 'y')
         else:
             a_gui.setEntry(n_entry, '0')
@@ -65,3 +101,4 @@ def gui_view_image(a_gui, data, title=""):
     a_gui.addButton("Image", press_image, row=ndim, column=0)
     a_gui.stopSubWindow()
     a_gui.showSubWindow("image")
+    a_gui.remove
