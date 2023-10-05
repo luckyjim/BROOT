@@ -72,16 +72,16 @@ def gui_view_plot1d(a_gui, data, title=""):
         a_gui.destroySubWindow("plot1d")
     except:
         pass
-    a_gui.startSubWindow("plot1d", f"BROOT Plot {title}", modal=True, blocking=True)
+    a_gui.startSubWindow("plot1d", f"BROOT plot sample: {title}", modal=True, blocking=True)
     a_gui.setSize(1000, 300)
     a_gui.setExpand("both")
     ndim = data.ndim
     # Col 0
     a_gui.startFrame("LEFT", row=0, column=0)
     try:
-        str_range = f"Range {data.shape}"
+        str_range = f"Shape {data.shape}"
     except:
-        str_range = "Range irregular"
+        str_range = "Shape irregular"
     a_gui.addLabel("p1d_range",str_range, row=0, column=0)   
     # 0 est la valeur par defaut pour les premieres dimension
     # la derniere dimension est :

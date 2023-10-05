@@ -11,7 +11,7 @@ BROOT doesn't use the ROOT library but the IO-specific library [uproot](https://
 # BROOT GUI
 
 ## Table for each TTree
-![BROOT_table](docs/BROOT2.png)
+![BROOT_table](docs/BROOT3.png)
 
 ### Basic print value
 
@@ -35,6 +35,20 @@ You can configure the frequency of sampling with GUI.
 
 ![BROOT_1d](docs/BROOT_histo.png)
 
+#### Plot point
+
+2 dimensions
+
+![BROOT_point2](docs/plot_point_2d.png)
+
+or 3 dimension with animate plot
+
+![BROOT_point3](docs/plot_point_3d.png)
+
+#### Image
+
+![BROOT_image](docs/plot_image.png)
+
 # Installation
 
 Check if tkinter library is correctly installed with
@@ -44,6 +58,12 @@ python -m tkinter
 ```
 
 else see [installation documentation](https://tkdocs.com/tutorial/install.html)
+
+upgrading pip and setuptools packages can help
+
+```
+pip install --upgrade setuptools pip
+```
 
 then BROOT installs very simply with pip install
 
@@ -56,13 +76,6 @@ run BROOT in a terminal with this command
 ```
 BROOT.py
 ```
-
-upgrading pip and setuptools packages can help
-
-```
-pip install --upgrade setuptools pip
-```
-
 
 # Update version
 

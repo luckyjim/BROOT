@@ -22,7 +22,7 @@ import numpy as np
 import broot
 import ndarray_view.image as v_ima
 import ndarray_view.plot1d as v_p1d
-
+import ndarray_view.plot_point as v_point
 #
 # GLOBAL
 #
@@ -38,7 +38,7 @@ def func_menu(s_but):
     global g_app, g_froot, g_path_file
     
     if s_but == "ABOUT":
-        g_app.infoBox(f"About BROOT", f"Version: {broot.__version__}\n\nAuthor: Colley Jean-Marc")
+        g_app.infoBox(f"About BROOT", f"Version: {broot.__version__}\n\nAuthor: Colley Jean-Marc\n\nLab: CNRS/IN2P3/LPNHE\n\nFrance, Paris\n\nThanks to: Uproot, AppJar, Numpy, Matplotlib ")
     if s_but == "CLOSE":
         g_froot.close()
         g_app.removeAllWidgets()
@@ -77,7 +77,7 @@ def open_root_file(r_file):
         tbl_br = []
         tbl_br.append(['ID', "Branch", "Value", "Type", "Shape", "Size [Byte]"])
         l_act = []
-        l_button = [f"Print", f"Plot1D", f"Plot2D", f"Image"]
+        l_button = [f"Print", f"Plot 1D", f"Plot point", f"Image"]
         for idx0, branch in enumerate(l_branch):
             idx1 = idx0 + 1
             s_idx1 = f"{idx1:03}"
@@ -103,7 +103,7 @@ def open_root_file(r_file):
                 a_type_s = val_br.typestr.split('*')
                 a_shape = '(' + ','.join(a_type_s[:-1]) + ')' 
                 a_shape = a_shape.replace(' ', '')
-                new_line = [s_idx1, f"{branch}", f"Array! Try Action", f"{a_type_s[-1].strip()}", f"{a_shape}", f"{val_br.nbytes:,}"]
+                new_line = [s_idx1, f"{branch}", f"Array ! Try Action", f"{a_type_s[-1].strip()}", f"{a_shape}", f"{val_br.nbytes:,}"]
             tbl_br.append(new_line)
             # if idx > 5: break
             t_idx += 1            
@@ -135,20 +135,21 @@ def main_action(s_but, i_line):
         pass
     if s_but.find("Print") >= 0:
         if data.nbytes > 1024 * 100:
-            g_app.errorBox(f"DATA of {ttree}/{branch}", "Too big, try plotxx action instead !")
+            g_app.errorBox(f"DATA of {ttree}.{branch}", "Too big, try 'Plot xx' action instead !")
             return
         try:
             str_a = np.array2string(data)
         except:
             str_a = f"{data.tolist()}"
-        g_app.infoBox(f"DATA of {ttree}/{branch}", str_a)
-    elif s_but.find("Plot1D") >= 0:
-        v_p1d.gui_view_plot1d(g_app, data, f"{ttree}/{branch}")
-    elif s_but.find("Plot2D") >= 0:
-        g_app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
+        g_app.infoBox(f"DATA of {ttree}.{branch}", str_a)
+    elif s_but.find("Plot 1D") >= 0:
+        v_p1d.gui_view_plot1d(g_app, data, f"{ttree}.{branch}")
+    elif s_but.find("Plot point") >= 0:
+        # g_app.infoBox(f"{ttree}.{branch}", "Not available. Work in progreess")
+        v_point.gui_view_point(g_app, data, f"{ttree}.{branch}")
     elif s_but.find("Image") >= 0:
-        # g_app.infoBox(f"{ttree}/{branch}", "Not available. Work in progreess")
-        v_ima.gui_view_image(g_app, data, f"{ttree}/{branch}")
+        # g_app.infoBox(f"{ttree}.{branch}", "Not available. Work in progreess")
+        v_ima.gui_view_image(g_app, data, f"{ttree}.{branch}")
 
 
 def main_gui(r_file=None, d_file=None):
