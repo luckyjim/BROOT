@@ -38,7 +38,7 @@ def func_menu(s_but):
     global g_app, g_froot, g_path_file
     
     if s_but == "ABOUT":
-        g_app.infoBox(f"About BROOT", f"Version: {broot.__version__}\n\nAuthor: Colley Jean-Marc\n\nLab: CNRS/IN2P3/LPNHE\n\nFrance, Paris\n\nThanks to: Uproot, AppJar, Numpy, Matplotlib ")
+        g_app.infoBox(f"About BROOT", f"Version: {broot.__version__} Beta\n\nAuthor: Colley Jean-Marc\n\nLab: CNRS/IN2P3/LPNHE\n\nFrance, Paris\n\nBROOT uses: \nUproot, AppJar, Numpy, Matplotlib\n\n    Oct. 2023")
     if s_but == "CLOSE":
         g_froot.close()
         g_app.removeAllWidgets()

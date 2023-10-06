@@ -11,17 +11,33 @@ BROOT doesn't use the ROOT library but the IO-specific library [uproot](https://
 # BROOT GUI
 
 ## Table for each TTree
+
 ![BROOT_table](docs/BROOT3.png)
 
-### Basic print value
+### Action "Print"
+
+This action can be applied on small array, 
 
 ![BROOT_print](docs/BROOT_print.png)
+
+else you can try another actions of plots.
 
 ### Basic plots
 
 Range of plot is configurable with GUI, same syntax as [numpy](https://numpy.org/doc/stable/user/basics.indexing.html#basic-indexing) array. [Matplotlib](https://matplotlib.org/) is used to create the figures.
 
-#### Plot 1D
+#### Action "Plot 1D"
+
+For each dimension, you must define a range with python/numpy convention or an index.
+
+We apply the numpy flatten function to the final array to obtain a 1D array.
+
+You can have 3 representations of the 1D array:
+* plot by sample
+* power spectrum density
+* histogram
+
+#### Plot sample
 
 ![BROOT_1d](docs/BROOT_plot_1d.png)
 
@@ -35,17 +51,34 @@ You can configure the frequency of sampling with GUI.
 
 ![BROOT_1d](docs/BROOT_histo.png)
 
-#### Plot point
+#### Action "Plot point"
 
-2 dimensions
+With this action you can plot points in 2D or 3D space. For each dimension, you must define a range with python/numpy convention or an index.
+The definition of axis x, y and optionaly z must be in the same dimension with syntax:
+* x=integer ; y=integer
+
+"=" is optional, it's 2 definitions are equivalent:
+* x=0;y=1
+* x0;y1
+
+The global shape for each axis must be a 1D array, so the symbol ":" must only appear once in one of the dimensions.
 
 ![BROOT_point2](docs/plot_point_2d.png)
 
-or 3 dimension with animate plot
+For 3 dimensions: 
+* x=integer ; y=integer ; z=integer
+
+the associated figure is interactive, it allows you to choose your viewing angle
 
 ![BROOT_point3](docs/plot_point_3d.png)
 
-#### Image
+#### Action "Image"
+
+You must defined x axis and y axis in different dimension. By default "x" in dimension means takes all data, like "x=:".
+
+You can defined range after x or y, example:
+
+* y=75:125
 
 ![BROOT_image](docs/plot_image.png)
 
