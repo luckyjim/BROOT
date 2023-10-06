@@ -58,8 +58,8 @@ The definition of axis x, y and optionaly z must be in the same dimension with s
 * x=integer ; y=integer
 
 "=" is optional, it's 2 definitions are equivalent:
-* x=0;y=1
-* x0;y1
+* x=0 ; y=1
+* x0 ; y1
 
 The global shape for each axis must be a 1D array, so the symbol ":" must only appear once in one of the dimensions.
 
