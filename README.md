@@ -116,3 +116,9 @@ BROOT.py
 python -m pip uninstall BROOT
 python -m pip install git+https://github.com/luckyjim/BROOT.git 
  ```
+ 
+# Other ROOT file browser
+
+* [uproot-browser](https://github.com/scikit-hep/uproot-browser) with TEXT gui
+* [uproot_browser](https://github.com/jrueb/uproot_browser) with GTK gui
+
