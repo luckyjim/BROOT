@@ -121,4 +121,4 @@ python -m pip install git+https://github.com/luckyjim/BROOT.git
 
 * [uproot-browser](https://github.com/scikit-hep/uproot-browser) with TEXT gui
 * [uproot_browser](https://github.com/jrueb/uproot_browser) with GTK gui
-
+* [jsroot](https://github.com/root-project/jsroot) in HTML using [Visual Studio Code](https://root.cern/blog/vscode-extension-announcement/)
