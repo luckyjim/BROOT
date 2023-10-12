@@ -1,11 +1,10 @@
 # BROOT presentation
 
-BROOT is a browser for [ROOT files](https://root.cern/manual/io), format defined and used by CERN collaboration.
+BROOT is a viewer / browser for [ROOT files](https://root.cern/manual/io), format defined and used by CERN collaboration.
 
 BROOT is an alternative to the [TBrowser tool](https://root.cern/manual/root_files/#root-object-browser)
 
-BROOT doesn't use the ROOT library but the IO-specific library [uproot](https://uproot.readthedocs.io/en/latest/).
-
+BROOT doesn't use the ROOT library but the IO-specific library [uproot](https://uproot.readthedocs.io/en/latest/), which allows for easy and lightweight installation.
 
 
 # BROOT GUI
@@ -14,7 +13,7 @@ BROOT doesn't use the ROOT library but the IO-specific library [uproot](https://
 
 ![BROOT_table](docs/BROOT3.png)
 
-### Action "Print"
+## Action "Print"
 
 This action can be applied on small array, 
 
@@ -22,11 +21,11 @@ This action can be applied on small array,
 
 else you can try another actions of plots.
 
-### Basic plots
+## Basic plots
 
 Range of plot is configurable with GUI, same syntax as [numpy](https://numpy.org/doc/stable/user/basics.indexing.html#basic-indexing) array. [Matplotlib](https://matplotlib.org/) is used to create the figures.
 
-#### Action "Plot 1D"
+## Action "Plot 1D"
 
 For each dimension, you must define a range with python/numpy convention or an index.
 
@@ -37,21 +36,21 @@ You can have 3 representations of the 1D array:
 * power spectrum density
 * histogram
 
-#### Plot sample
+### Plot sample
 
 ![BROOT_1d](docs/BROOT_plot_1d.png)
 
-#### Power spectrum density
+### Power spectrum density
 
 You can configure the frequency of sampling with GUI.
 
 ![BROOT_1d](docs/BROOT_psd.png)
 
-#### Histogram
+### Histogram
 
 ![BROOT_1d](docs/BROOT_histo.png)
 
-#### Action "Plot point"
+## Action "Plot point"
 
 With this action you can plot points in 2D or 3D space. For each dimension, you must define a range with python/numpy convention or an index.
 The definition of axis x, y and optionaly z must be in the same dimension with syntax:
@@ -72,7 +71,7 @@ the associated figure is interactive, it allows you to choose your viewing angle
 
 ![BROOT_point3](docs/plot_point_3d.png)
 
-#### Action "Image"
+### Action "Image"
 
 You must defined x axis and y axis in different dimension. By default "x" in dimension means takes all data, like "x=:".
 
@@ -117,7 +116,7 @@ python -m pip uninstall BROOT
 python -m pip install git+https://github.com/luckyjim/BROOT.git 
  ```
  
-# Other ROOT file browser
+# Other ROOT file viewer / browser
 
 * [uproot-browser](https://github.com/scikit-hep/uproot-browser) with TEXT gui
 * [uproot_browser](https://github.com/jrueb/uproot_browser) with GTK gui
