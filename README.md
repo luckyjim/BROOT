@@ -109,6 +109,7 @@ run BROOT in a terminal with this command
 BROOT.py
 ```
 
+
 # Update version
 
 ```
@@ -116,8 +117,19 @@ python -m pip uninstall BROOT
 python -m pip install git+https://github.com/luckyjim/BROOT.git 
  ```
  
+# Problems
+
+## Type Error when open root file ?
+
+Probably you need to update uproot version
+
+```
+python -m pip install --upgrade uproot
+```
+
 # Other ROOT file viewer / browser
 
 * [uproot-browser](https://github.com/scikit-hep/uproot-browser) with TEXT gui
 * [uproot_browser](https://github.com/jrueb/uproot_browser) with GTK gui
 * [jsroot](https://github.com/root-project/jsroot) in HTML using [Visual Studio Code](https://root.cern/blog/vscode-extension-announcement/)
+

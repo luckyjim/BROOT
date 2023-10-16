@@ -19,5 +19,5 @@ setup(
     scripts=["script/BROOT.py"],
     license='MIT',
     python_requires='>=3.7',
-    install_requires=["appJar", "matplotlib", "uproot", "numpy","scipy"]
+    install_requires=["appJar", "scipy", "matplotlib", "uproot=>5.0.11", "numpy"]
 )
