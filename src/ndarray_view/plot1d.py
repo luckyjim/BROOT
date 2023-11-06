@@ -14,7 +14,7 @@ def gui_view_plot1d(a_gui, data, title=""):
     def get_slice_array():
         s_idx = ""
         for idx in range(ndim):
-            s_rge = a_gui.getEntry(f'dim {idx}')
+            s_rge = a_gui.getEntry(f'sample_dim {idx}')
             s_idx += f"{s_rge},"
         s_idx = s_idx[:-1]
         try:
@@ -87,8 +87,8 @@ def gui_view_plot1d(a_gui, data, title=""):
     # la derniere dimension est :
     def_val = 0
     for idx in range(ndim):
-        n_entry = f"dim {idx}"
-        a_gui.addLabelEntry(n_entry, row=idx + 1, column=0)
+        n_entry = f"sample_dim {idx}"
+        a_gui.addLabelEntry(n_entry, row=idx + 1, column=0,label=f"axis {idx}")
         if (idx + 1) == ndim:
             def_val = ":"
         a_gui.setEntry(n_entry, def_val)

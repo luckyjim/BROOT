@@ -117,7 +117,7 @@ def gui_view_point(a_gui, data, title=""):
 
     for idx in range(ndim):
         n_entry = f"point_dim {idx}"
-        a_gui.addLabelEntry(n_entry, row=idx + 1, column=0, label=f"dim {idx}")
+        a_gui.addLabelEntry(n_entry, row=idx + 1, column=0, label=f"axis {idx}")
         if idx == 0:
             a_gui.setEntry(n_entry, 'x=0;y=1')
         elif idx == 1:
