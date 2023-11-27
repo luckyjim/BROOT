@@ -184,10 +184,12 @@ def main_gui(r_file=None, d_file=None):
         d_ftables = {}
         for ttree in g_d_fulltables.keys():
             if ttree.find(fstr_tree) >= 0:
-                d_ftables[ttree] = []
-                d_ftables[ttree].append(['ID', "TBranch", "Value", "Type", "Shape", "Size [Byte]"])
-                for branch in g_d_fulltables[ttree]:
-                    if branch[1].find(fstr_branch) >= 0:
+                d_ftables[ttree] = []            
+                for idx, branch in enumerate(g_d_fulltables[ttree]):
+                    if idx == 0:
+                        # copy colname
+                        d_ftables[ttree].append(branch)
+                    elif branch[1].find(fstr_branch) >= 0:
                         d_ftables[ttree].append(branch)
                         print("Select ", branch[1])
                 if len(d_ftables[ttree]) == 1:
