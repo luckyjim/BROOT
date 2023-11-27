@@ -32,7 +32,9 @@ g_app.setLogLevel("ERROR")
 g_path_file = ""
 # file root open with uproot
 g_froot = None
+# global dictionary of full tables extracted from root file
 g_d_fulltables = {}
+# current table displayed, is a sub-set of g_d_fulltables
 g_d_tables = {}
 
 
@@ -43,7 +45,6 @@ def manage_menu(s_but):
         g_app.infoBox(f"About BROOT", f"Version: {broot.__version__} Beta\n\nAuthor: Colley Jean-Marc\n\nLab: CNRS/IN2P3/LPNHE\n\nFrance, Paris\n\nBROOT uses: \nUproot, AppJar, Numpy, Matplotlib\n\n    Nov. 2023")
     if s_but == "CLOSE":
         g_froot.close()
-        # g_app.removeAllWidgets()
         g_app.removeTabbedFrame("TTreeTabs")
         g_app.setTitle(f"BROOT no file")
         g_d_fulltables = {}
@@ -52,7 +53,6 @@ def manage_menu(s_but):
         r_file = g_app.openBox("BROOT open ROOT file", dirName=g_path_file, fileTypes=[('ROOT', '*.root'), ('ROOT', '*.r'), ("all", "*.*")])
         if len(r_file) != 0:
             g_path_file = os.path.dirname(r_file)
-            # open_root_file(r_file)
             rootfile_to_tables(r_file)
             create_gui_tables(r_file, g_d_fulltables)
             
@@ -101,7 +101,6 @@ def rootfile_to_tables(r_file):
                 a_shape = a_shape.replace(' ', '')
                 new_line = [s_idx1, f"{branch}", f"Array ! Try Action", f"{a_type_s[-1].strip()}", f"{a_shape}", f"{val_br.nbytes:,}"]
             tbl_br.append(new_line)
-            # if idx > 5: break
             t_idx += 1
         g_d_fulltables[ttree] = tbl_br
     
@@ -109,7 +108,6 @@ def rootfile_to_tables(r_file):
 def create_gui_tables(r_file, d_tables):
     global g_app, g_d_tables
     try:
-        # g_app.removeAllWidgets()
         g_app.removeTabbedFrame("TTreeTabs")
         pass
     except:
@@ -164,10 +162,8 @@ def manage_action(s_but, i_line):
     elif s_but.find("Plot 1D") >= 0:
         v_p1d.gui_view_plot1d(g_app, data, f"{ttree}.{branch}")
     elif s_but.find("Plot point") >= 0:
-        # g_app.infoBox(f"{ttree}.{branch}", "Not available. Work in progreess")
         v_point.gui_view_point(g_app, data, f"{ttree}.{branch}")
     elif s_but.find("Image") >= 0:
-        # g_app.infoBox(f"{ttree}.{branch}", "Not available. Work in progreess")
         v_ima.gui_view_image(g_app, data, f"{ttree}.{branch}")
 
 
@@ -208,7 +204,7 @@ def main_gui(r_file=None, d_file=None):
         create_gui_tables(r_file, g_d_fulltables)       
     
     tools = ["OPEN", "CLOSE", "ABOUT"]
-    # g_app.setSticky("news")
+    # Create widget for "filter"
     g_app.setExpand("both")
     g_app.setStretch("none")
     g_app.setFont(18)
@@ -221,6 +217,7 @@ def main_gui(r_file=None, d_file=None):
     g_app.addButton("Reset", filter_reset, 0, 2, rowspan=2)
     g_app.addLabel("Empty line", "", 2, 0)
     g_app.stopFrame()
+    # end of widget for "filter"
     g_app.setStretch("both")   
     if r_file is None:
         if d_file:
@@ -231,7 +228,6 @@ def main_gui(r_file=None, d_file=None):
         if len(r_file) == 0:
             sys.exit(0)
     g_path_file = os.path.dirname(r_file)
-    # open_root_file(r_file)
     rootfile_to_tables(r_file)
     create_gui_tables(r_file, g_d_fulltables)
     g_app.go()
