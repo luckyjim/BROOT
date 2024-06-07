@@ -1,38 +1,69 @@
-'''
+"""
 Created on 29 sept. 2023
-
+plt.tight_layout()
 @author: jcolley
-'''
+"""
 
 from appJar import gui
-import matplotlib.pyplot as plt
 import numpy as np
+
+import matplotlib.pyplot as plt
+from matplotlib.widgets import CheckButtons
+
+
+def plot_3d(data_xd, title):
+    def change_checkbutton(label):
+        print(label)
+        if label == labels[0]:
+            if activated[0]:
+                ax1.axis("auto")
+            else:
+                ax1.axis("equal")
+            activated[0] = not activated[0]
+            plt.draw()
+
+    fig, ax = plt.subplots()
+    fig.subplots_adjust(bottom=0.2)
+    # 3D plot
+    ax1 = fig.add_subplot(projection="3d")
+    ax.tick_params(labelleft=False, labelbottom=False)
+    ax1.scatter(data_xd[0], data_xd[1], data_xd[2])
+    ax1.axis("equal")
+    ax1.set_title(title)
+    ax1.grid()
+    # Button
+    axcheck = fig.add_axes([0.7, 0.05, 0.2, 0.075])
+    labels = ["Same scale"]
+    activated = [True]
+    chxbox = CheckButtons(axcheck, labels, activated)
+    chxbox.on_clicked(change_checkbutton)
+
+    plt.show()
 
 
 def gui_view_point(a_gui, data, title=""):
-    
     def get_slice_array():
         s_idx = ""
         f_def_sample_dim = True
         f_nodef_dim = [True, True, True]
-        d_dim_char = {"x":0, "y":1, "z":2}
-        d_dim_idx = {"x":0, "y":0, "z":0}
+        d_dim_char = {"x": 0, "y": 1, "z": 2}
+        d_dim_idx = {"x": 0, "y": 0, "z": 0}
         l_data = [0, 0, 0]
-        s_xyz= ""
+        s_xyz = ""
         nb_dim = 0
         for idx in range(ndim):
-            s_ori_rge = a_gui.getEntry(f'point_dim {idx}').replace(" ", "")
+            s_ori_rge = a_gui.getEntry(f"point_dim {idx}").replace(" ", "")
             s_rge = s_ori_rge.lower()
             print(s_rge)
-            if s_rge.find('x') >= 0:
-                s_rge = s_rge.replace(',', ';')
+            if s_rge.find("x") >= 0:
+                s_rge = s_rge.replace(",", ";")
                 s_xyz = s_rge
                 # s_rge example: x=0;y=2;z=1
-                s_rge = s_rge.replace('x=', 'x')
-                s_rge = s_rge.replace('y=', 'y')
-                s_rge = s_rge.replace('z=', 'z')
+                s_rge = s_rge.replace("x=", "x")
+                s_rge = s_rge.replace("y=", "y")
+                s_rge = s_rge.replace("z=", "z")
                 print(f"'{s_rge}' {type(s_rge)} ")
-                items = s_rge.split( ';')
+                items = s_rge.split(";")
                 nb_dim = len(items)
                 s_idx += f"<DIM>,"
                 for item in items:
@@ -44,15 +75,18 @@ def gui_view_point(a_gui, data, title=""):
                                     d_dim_idx[dim_char] = int(item[1:])
                                     f_nodef_dim[idx] = False
                                 except:
-                                    a_gui.errorBox(title, f"Can't convert '{item}' in integer type, index string: {s_ori_rge}")
+                                    a_gui.errorBox(
+                                        title,
+                                        f"Can't convert '{item}' in integer type, index string: {s_ori_rge}",
+                                    )
                                     return False, None, None, None
                             else:
                                 a_gui.errorBox(title, f"{dim_char} appears two times ! {s_ori_rge}")
                                 return False, None, None, None
                 if f_nodef_dim[0] or f_nodef_dim[1]:
                     a_gui.errorBox(title, f"You must define 2 dimensions with x=?,y=?")
-                    return False, None, None, None                   
-            elif s_rge.find(':') >= 0: 
+                    return False, None, None, None
+            elif s_rge.find(":") >= 0:
                 s_idx += f"{s_rge},"
                 f_def_sample_dim = False
             elif len(s_rge) == 0:
@@ -66,9 +100,9 @@ def gui_view_point(a_gui, data, title=""):
         # remove last ,
         s_idx = s_idx[:-1]
         for dim_char, idx in d_dim_char.items():
-            s_temp_idx = s_idx.replace('<DIM>', str(d_dim_idx[dim_char]))
+            s_temp_idx = s_idx.replace("<DIM>", str(d_dim_idx[dim_char]))
             try:
-                slice_ = eval(f'np.s_[{s_temp_idx}]')
+                slice_ = eval(f"np.s_[{s_temp_idx}]")
                 l_data[idx] = data[slice_]
             except:
                 a_gui.errorBox("ERROR", f"Slice {s_idx} not valid ?")
@@ -79,22 +113,28 @@ def gui_view_point(a_gui, data, title=""):
                 except:
                     a_gui.errorBox(title, "Can't convert in regular array")
                     return False, None, None, None
-        s_slice = s_idx.replace('<DIM>', ' ('+s_xyz+') ')
-        return True, l_data, s_slice , nb_dim
-        
+        s_slice = s_idx.replace("<DIM>", " (" + s_xyz + ") ")
+        return True, l_data, s_slice, nb_dim
+
     def press_image():
-        f_conv , data_xd , s_idx, nb_dim = get_slice_array()
+        f_conv, data_xd, s_idx, nb_dim = get_slice_array()
         if not f_conv:
             return
-        fig = plt.figure()
+        m_title = title + f", range [{s_idx}]"
         if nb_dim == 2:
+            fig = plt.figure()
             plt.scatter(data_xd[0], data_xd[1])
+            plt.title()
+            plt.grid()
+            plt.show()
         else:
-            ax = fig.add_subplot(projection='3d')
-            ax.scatter(data_xd[0], data_xd[1], data_xd[2])
-        plt.title(title + f", range [{s_idx}]")
-        plt.grid()
-        plt.show()
+            # fig, ax = plt.subplots()
+            # ax1 = fig.add_subplot(projection='3d')
+            # fig.subplots_adjust(bottom=0.2)
+            # ax1.scatter(data_xd[0], data_xd[1], data_xd[2])
+            # ax1.axis("equal")
+            # axprev = fig.add_axes([0.7, 0.05, 0.1, 0.075])
+            plot_3d(data_xd, m_title)
 
     try:
         a_gui.destroySubWindow("point")
@@ -104,26 +144,26 @@ def gui_view_point(a_gui, data, title=""):
     a_gui.setSize(1000, 300)
     a_gui.setExpand("both")
     ndim = data.ndim
-    if ndim <= 1: 
+    if ndim <= 1:
         a_gui.errorBox(title, "Dimension of array must be => 2.")
-        return 
+        return
     # Col 0
     a_gui.startFrame("point_LEFT", row=0, column=0)
     try:
         str_range = f"Shape {data.shape}"
     except:
         str_range = "Shape irregular"
-    a_gui.addLabel("point_range", str_range, row=0, column=0)   
+    a_gui.addLabel("point_range", str_range, row=0, column=0)
 
     for idx in range(ndim):
         n_entry = f"point_dim {idx}"
         a_gui.addLabelEntry(n_entry, row=idx + 1, column=0, label=f"axis {idx}")
         if idx == 0:
-            a_gui.setEntry(n_entry, 'x=0;y=1')
+            a_gui.setEntry(n_entry, "x=0;y=1")
         elif idx == 1:
-            a_gui.setEntry(n_entry, ':')
+            a_gui.setEntry(n_entry, ":")
         else:
-            a_gui.setEntry(n_entry, '')
+            a_gui.setEntry(n_entry, "")
     a_gui.stopFrame()
     a_gui.addButton("Plot", press_image, row=ndim, column=0)
     a_gui.stopSubWindow()
