@@ -37,6 +37,7 @@ g_froot = None
 g_d_fulltables = {}
 # current table displayed, is a sub-set of g_d_fulltables
 g_d_tables = {}
+g_max_gb = 5
 
 
 def manage_menu(s_but):
@@ -91,41 +92,54 @@ def rootfile_to_tables(r_file):
             idx1 = idx0 + 1
             s_idx1 = f"{idx1:03}"
             print(t_idx, idx0, branch)
-            print("Please wait, reading TBranch ...")
-            val_br = g_froot[ttree][branch].array()
-            try:
-                # NUMPY array
-                np_br = val_br.to_numpy()
+            print("Please wait, reading array TBranch ...")
+            tb_array = g_froot[ttree][branch]
+            size_gb = tb_array.uncompressed_bytes/1024**3
+            if size_gb > g_max_gb:
                 new_line = [
                     s_idx1,
                     f"{branch}",
-                    f"Array! Try Action",
-                    f"{np_br.dtype}",
-                    f"{np_br.shape}",
-                    f"{np_br.nbytes:,}",
+                    f"Array ! too big",
+                    f"Unknown",
+                    f"Unknown",
+                    f"{size_gb:.1f} GB",
                 ]
-                if np_br.size == 0:
-                    new_line[2] = f"Empty !?"
-                if np_br.size == 1:
-                    print(np_br)
-                    if val_br.typestr.find("string") >= 0:
-                        new_line[2] = f"'{np_br[0]}'"
-                        new_line[3] = "string"
-                    else:
-                        new_line[2] = np_br.ravel()[0]
-            except:
-                # IRREGULAR array
-                a_type_s = val_br.typestr.split("*")
-                a_shape = "(" + ",".join(a_type_s[:-1]) + ")"
-                a_shape = a_shape.replace(" ", "")
-                new_line = [
-                    s_idx1,
-                    f"{branch}",
-                    f"Array ! Try Action",
-                    f"{a_type_s[-1].strip()}",
-                    f"{a_shape}",
-                    f"{val_br.nbytes:,}",
-                ]
+            else:
+                val_br = g_froot[ttree][branch].array()
+                try:
+                    # NUMPY array
+                    print("\t try convert in numpy")
+                    np_br = val_br.to_numpy()
+                    new_line = [
+                        s_idx1,
+                        f"{branch}",
+                        f"Array! Try Action",
+                        f"{np_br.dtype}",
+                        f"{np_br.shape}",
+                        f"{np_br.nbytes:,}",
+                    ]
+                    if np_br.size == 0:
+                        new_line[2] = f"Empty !?"
+                    if np_br.size == 1:
+                        print(np_br)
+                        if val_br.typestr.find("string") >= 0:
+                            new_line[2] = f"'{np_br[0]}'"
+                            new_line[3] = "string"
+                        else:
+                            new_line[2] = np_br.ravel()[0]
+                except:
+                    # IRREGULAR array
+                    a_type_s = val_br.typestr.split("*")
+                    a_shape = "(" + ",".join(a_type_s[:-1]) + ")"
+                    a_shape = a_shape.replace(" ", "")
+                    new_line = [
+                        s_idx1,
+                        f"{branch}",
+                        f"Array ! Try Action",
+                        f"{a_type_s[-1].strip()}",
+                        f"{a_shape}",
+                        f"{val_br.nbytes:,}",
+                    ]
             tbl_br.append(new_line)
             t_idx += 1
         g_d_fulltables[ttree] = tbl_br
@@ -185,6 +199,11 @@ def manage_action(s_but, i_line):
     pars_line = g_app.getTableRow(f"table{id_t}", i_line)
     branch = pars_line[1]
     print(branch)
+    tb_array = g_froot[ttrees[id_t]][branch]
+    size_gb = tb_array.uncompressed_bytes/1024**3
+    if size_gb > g_max_gb:
+        g_app.errorBox(f"{ttree}.{branch}", f"Aborted, array is to big > {g_max_gb}GB")
+        return
     data = g_froot[ttrees[id_t]][branch].array()
     try:
         data = data.to_numpy()
@@ -295,6 +314,7 @@ def main_gui(r_file=None, d_file=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Browser for ROOT files from CERN collaboration.")
     parser.add_argument("-f", "--file", help="path to ROOT file or directory", required=False)
+    parser.add_argument("-m","--max_gb", help="Threshold in GB for big array in TBranch", required=False,type=int, default=5)
     parser.add_argument(
         "-v", "--version", help="BROOT version", action="store_true", required=False
     )
@@ -302,6 +322,9 @@ if __name__ == "__main__":
     if args.version:
         print(broot.__version__)
         sys.exit(0)
+    if args.max_gb:
+        g_max_gb = args.max_gb
+        print(f'update g_max_gb {g_max_gb}')
     if args.file is not None:
         abs_file = os.path.abspath(args.file)
         assert os.path.exists(abs_file), f"'{abs_file}' doesn't exist !!"

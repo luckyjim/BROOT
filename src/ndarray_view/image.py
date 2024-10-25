@@ -8,6 +8,8 @@ from appJar import gui
 import matplotlib.pyplot as plt
 import numpy as np
 
+import matplotlib
+matplotlib.use('TkAgg')
 
 def gui_view_image(a_gui, data, title=""):
     def get_slice_array():

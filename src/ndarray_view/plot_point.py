@@ -124,7 +124,7 @@ def gui_view_point(a_gui, data, title=""):
         if nb_dim == 2:
             fig = plt.figure()
             plt.scatter(data_xd[0], data_xd[1])
-            plt.title()
+            plt.title(m_title)
             plt.grid()
             plt.show()
         else:
