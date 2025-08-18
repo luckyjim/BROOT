@@ -9,7 +9,7 @@ BROOT doesn't use the ROOT library but the IO-specific library [uproot](https://
 
 # BROOT GUI
 
-## Table for each TTreeappJar
+## Table for each TTree
 
 ![BROOT_table](docs/BROOT3.png)
 
